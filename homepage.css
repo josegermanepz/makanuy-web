@@ -1,0 +1,45 @@
+.home-wix{background:#fff;color:#000}
+.home-hero{display:grid;grid-template-columns:1fr 1fr;min-height:595px;margin:0}
+.home-hero__collage,.home-hero__photo{position:relative;min-width:0}
+.home-hero__collage{background:#ded7c7}
+.home-hero__collage>img,.home-hero__photo>img{display:block;width:100%;height:100%;object-fit:cover}
+.home-hero__copy{position:absolute;left:8%;right:3%;top:25%;z-index:1}
+.home-hero__copy h1{display:inline;background:#fff;box-decoration-break:clone;-webkit-box-decoration-break:clone;font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(48px,4.45vw,72px);font-weight:400;line-height:1.06;padding:0 10px;margin:0}
+.home-hero__copy p{display:table;background:#fff;font-family:"Cormorant Garamond",Georgia,serif;font-size:25px;line-height:1.15;margin:14px 0 0;padding:2px 10px}
+.home-services{max-width:1150px;margin:0 auto;padding:160px 24px 90px}
+.home-services>h2,.home-section-title{text-align:center;font-family:Montserrat,Arial,sans-serif!important;font-size:28px!important;font-weight:400!important;letter-spacing:.02em;margin:0 0 40px}
+.home-service{display:grid;grid-template-columns:92px minmax(0,1fr) 150px 165px;align-items:center;gap:24px;padding:32px 0;border-top:1px solid #111}
+.home-service:last-child{border-bottom:1px solid #111}
+.home-service img{width:84px;height:84px;border-radius:50%;object-fit:cover}
+.home-service h3{font-family:Montserrat,Arial,sans-serif;font-size:23px;font-weight:400;line-height:1.25;margin:0 0 8px}
+.home-service p{font-size:16px;line-height:1.45;margin:0 0 8px}
+.home-service .read-more{color:#111;text-decoration:underline;text-underline-offset:3px}
+.home-service__meta{font-size:16px;line-height:1.8}
+.home-service__book{justify-self:end;background:#fff;border:1px solid #111;color:#111;padding:12px 20px;text-decoration:none;transition:.16s ease}
+.home-service__book:hover,.home-service__book:focus-visible{background:#FAD7CF}
+.home-instagram{padding:82px 24px;background:#fff;text-align:center}
+.home-instagram__links{display:flex;justify-content:center;gap:22px;margin:-22px 0 30px}
+.home-instagram__links a{color:#111}
+.home-instagram__grid{max-width:1150px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.home-instagram__grid a{display:block;overflow:hidden;background:#f3f3f3}
+.home-instagram__grid img{width:100%;aspect-ratio:1;object-fit:cover;transition:transform .25s ease}
+.home-instagram__grid a:hover img{transform:scale(1.025)}
+.home-recipes{max-width:1150px;margin:0 auto;padding:85px 24px}
+.home-recipe-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+.home-recipe{color:#111;text-decoration:none}
+.home-recipe img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.home-recipe h3{font-family:Montserrat,Arial,sans-serif;font-size:23px;font-weight:400;line-height:1.3;margin:16px 0 8px}
+.home-recipe p{line-height:1.55;margin:0}
+.home-about{display:grid;grid-template-columns:1fr 1fr;min-height:600px;background:#f5f1e8}
+.home-about img{width:100%;height:100%;object-fit:cover}
+.home-about__copy{display:flex;flex-direction:column;justify-content:center;padding:70px 9%}
+.home-about__copy h2{font-family:Montserrat,Arial,sans-serif!important;font-size:28px!important;font-weight:400!important;letter-spacing:.04em;margin:0 0 28px}
+.home-about__copy .mission{font-family:"Cormorant Garamond",Georgia,serif;font-size:36px;margin:0 0 20px}
+.home-about__copy p{font-size:18px;line-height:1.75;margin:0}
+.home-testimonials{padding:90px 24px 105px;text-align:center}
+.home-testimonial-grid{max-width:1150px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.home-testimonial{background:#FAD7CF;padding:36px 30px;text-align:left}
+.home-testimonial blockquote{font-family:"Cormorant Garamond",Georgia,serif;font-size:22px;line-height:1.5;margin:0 0 24px}
+.home-testimonial cite{font-style:normal;font-weight:600}
+@media(max-width:900px){.home-hero{grid-template-columns:1fr}.home-hero__collage,.home-hero__photo{min-height:480px}.home-services{padding-top:80px}.home-service{grid-template-columns:78px minmax(0,1fr) 120px}.home-service__book{grid-column:2/4;justify-self:start}.home-instagram__grid{grid-template-columns:repeat(3,1fr)}.home-testimonial-grid{grid-template-columns:1fr}.home-about{grid-template-columns:1fr}.home-about img{max-height:560px}.home-recipe-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.home-hero__collage,.home-hero__photo{min-height:390px}.home-hero__copy{top:22%;left:6%;right:6%}.home-hero__copy h1{font-size:43px}.home-hero__copy p{font-size:22px}.home-services{padding:65px 18px}.home-service{grid-template-columns:64px 1fr;gap:18px;padding:26px 0}.home-service img{width:62px;height:62px}.home-service h3{font-size:19px}.home-service__meta{grid-column:2}.home-service__book{grid-column:2;padding:10px 16px}.home-instagram__grid{grid-template-columns:1fr 1fr}.home-instagram__grid a:last-child{display:none}.home-about__copy{padding:55px 24px}.home-testimonials{padding-left:18px;padding-right:18px}}
