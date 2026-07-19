@@ -63,33 +63,6 @@
     "location": "online"
   },
   {
-    "id": "lactancia",
-    "slug": "asesoría-de-lactancia",
-    "name": "Asesoría de Lactancia",
-    "minutes": 60,
-    "price": 350,
-    "deposit": 250,
-    "location": "presencial"
-  },
-  {
-    "id": "presencial",
-    "slug": "consulta-presencial",
-    "name": "Consulta Presencial",
-    "minutes": 60,
-    "price": 850,
-    "deposit": 250,
-    "location": "presencial"
-  },
-  {
-    "id": "adulto-mayor",
-    "slug": "consulta-para-adulto-mayor",
-    "name": "Consulta para Adulto Mayor",
-    "minutes": 60,
-    "price": 1000,
-    "deposit": 250,
-    "location": "presencial"
-  },
-  {
     "id": "empresas",
     "slug": "consultoría-nutricional-para-empresas",
     "name": "Consultoría Nutricional para Empresas",
@@ -97,14 +70,5 @@
     "price": null,
     "deposit": null,
     "location": "por-definir"
-  },
-  {
-    "id": "familiar",
-    "slug": "consulta-familiar",
-    "name": "Consulta Familiar",
-    "minutes": 60,
-    "price": 2360,
-    "deposit": 250,
-    "location": "presencial"
   }
 ]

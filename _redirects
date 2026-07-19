@@ -14,11 +14,13 @@
 /privacidad/ /privacidad.html 200
 /terminos/ /terminos.html 200
 /cookies/ /cookies.html 200
-/servicios/consulta-presencial/ /servicios-consulta-presencial.html 200
-/servicios/consulta-para-adulto-mayor/ /servicios-consulta-para-adulto-mayor.html 200
-/servicios/consulta-familiar/ /servicios-consulta-familiar.html 200
+/servicios/consulta-presencial/ /servicios.html 301
+/servicios/consulta-para-adulto-mayor/ /servicios.html 301
+/servicios/consulta-familiar/ /servicios.html 301
 /servicios/consulta-bienestar-composicion-corporal/ /servicios-consulta-bienestar-composicion-corporal.html 200
 /servicios/consulta-de-nutricion-hormonal/ /servicios-consulta-de-nutricion-hormonal.html 200
 /servicios/consulta-de-embarazo/ /servicios-consulta-de-embarazo.html 200
 /servicios/consulta-para-el-climaterio-y-menopausia/ /servicios-consulta-para-el-climaterio-y-menopausia.html 200
 /servicios/consulta-online/ /servicios-consulta-online-1.html 200
+
+/servicios/asesoria-de-lactancia/ /servicios.html 301
