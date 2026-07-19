@@ -22,5 +22,13 @@
 /servicios/consulta-de-embarazo/ /servicios-consulta-de-embarazo.html 200
 /servicios/consulta-para-el-climaterio-y-menopausia/ /servicios-consulta-para-el-climaterio-y-menopausia.html 200
 /servicios/consulta-online/ /servicios-consulta-online-1.html 200
+/servicios/consulta-de-nutricion-y-sistema-inmune/ /servicios-consulta-de-nutricion-y-sistema-inmune.html 200
+/servicios/tanita-bioempedancia/ /servicios-tanita-bioempedancia.html 200
+/recetas/rollitos-del-mar/ /recetas-rollitos-del-mar.html 200
+/recetas/tostadas-crunch-de-atun-tropical/ /recetas-tostadas-crunch-de-atun-tropical.html 200
 
 /servicios/asesoria-de-lactancia/ /servicios.html 301
+/servicios-consulta-presencial.html /servicios.html 301
+/servicios-asesoria-de-lactancia.html /servicios.html 301
+/servicios-consulta-para-adulto-mayor.html /servicios.html 301
+/servicios-consulta-familiar.html /servicios.html 301
