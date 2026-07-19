@@ -3,7 +3,7 @@
   const current = clean(location.pathname);
   document.querySelectorAll('.site-header nav a[href]').forEach(link => {
     const target = clean(new URL(link.href, location.href).pathname);
-    const active = current === target || (current === '/nutricion-mujer' && target === '/nutricion-mujer');
+    const active = current === target || (current === '/' && target === '/index');
     if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
   });
   const water = document.querySelector('[data-wix-water]');
