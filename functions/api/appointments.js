@@ -2,7 +2,7 @@ import {SERVICES,json,readJson,clean,sendEmail,escapeHtml,googleAutomation} from
 import {availableSlots,localDateTime,slotAvailable} from '../_schedule.js';
 
 const find=async(env,folio,email)=>env.DB.prepare('SELECT id,folio,service_id,service_name,date,start_at,end_at,name,email,phone,status,calendar_event_id FROM appointments WHERE folio=? AND lower(email)=lower(?)').bind(clean(folio,40),clean(email,180)).first();
-const canChange=row=>['pending_confirmation','pending','confirmed'].includes(row.status)&&new Date(row.start_at).getTime()-Date.now()>=48*60*60*1000;
+const canChange=row=>['pending_confirmation','pending','confirmed'].includes(row.status)&&new Date(row.start_at).getTime()-Date.now()>=24*60*60*1000;
 const notify=async(env,row,subject,message)=>Promise.all([
   sendEmail(env,{to:env.BOOKING_EMAIL||'yunuen.preg@gmail.com',subject,html:`<p>${escapeHtml(message)}</p><p>${escapeHtml(row.service_name)} · ${escapeHtml(row.folio)}</p>`}),
   sendEmail(env,{to:row.email,subject,html:`<p>${escapeHtml(message)}</p><p>${escapeHtml(row.service_name)} · ${escapeHtml(row.folio)}</p>`})
@@ -21,7 +21,7 @@ export const onRequestPost=async({request,env})=>{
   if(!env.DB)return json({error:'Servicio no disponible'},503);
   const body=await readJson(request),row=await find(env,body?.folio,body?.email);
   if(!row)return json({error:'No encontramos una cita con esos datos.'},404);
-  if(!canChange(row))return json({error:'Los cambios en línea cierran 48 horas antes de la cita.'},400);
+  if(!canChange(row))return json({error:'Los cambios en línea cierran 24 horas antes de la cita.'},400);
   if(body.action==='cancel'){
     await env.DB.prepare("UPDATE appointments SET status='cancelled',updated_at=datetime('now') WHERE id=?").bind(row.id).run();
     const calendar=await googleAutomation(env,{action:'cancel',eventId:row.calendar_event_id,folio:row.folio,guest:row.email,admin:env.BOOKING_EMAIL||'yunuen.preg@gmail.com',service:row.service_name});
