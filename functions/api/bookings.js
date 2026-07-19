@@ -1,4 +1,4 @@
-import {SERVICES,json,readJson,clean,folio,sendEmail,escapeHtml} from '../_shared.js';
+import {SERVICES,json,readJson,clean,folio,sendEmail,escapeHtml,googleAutomation} from '../_shared.js';
 import {localDateTime,slotAvailable} from '../_schedule.js';
 
 export const onRequestPost=async({request,env})=>{
@@ -20,9 +20,11 @@ export const onRequestPost=async({request,env})=>{
   }catch{return json({error:'No fue posible guardar la cita. Intenta nuevamente.'},500)}
 
   const safeName=escapeHtml(patient),safeService=escapeHtml(service.name),safeDate=escapeHtml(body.date),safeTime=escapeHtml(body.time),safeEmail=escapeHtml(email),safePhone=escapeHtml(phone);
-  const notifications=await Promise.all([
+  const calendar=await googleAutomation(env,{action:'create',title:`Makanuy · ${service.name}`,start:startIso,end:endIso,description:`Solicitud ${code}\nPaciente: ${patient}\nTeléfono: ${phone}\nCorreo: ${email}`,location:service.location==='online'?'Consulta online':'Av. Homero 1339, Piso 5, Polanco II Secc, CDMX',guest:email,folio:code,patient,service:service.name,date:body.date,time:body.time,admin:env.BOOKING_EMAIL||'yunuen.preg@gmail.com'});
+  if(calendar.ok&&calendar.eventId)await env.DB.prepare('UPDATE appointments SET calendar_event_id=? WHERE id=?').bind(calendar.eventId,id).run();
+  const notifications=calendar.ok?[]:await Promise.all([
     sendEmail(env,{to:env.BOOKING_EMAIL||'yunuen.preg@gmail.com',subject:`Nueva solicitud de cita · ${code}`,html:`<h1>Nueva solicitud de cita</h1><p><strong>${safeService}</strong></p><p>${safeDate} · ${safeTime}</p><p>${safeName}<br>${safeEmail}<br>${safePhone}</p><p>Folio: ${code}</p>`}),
     sendEmail(env,{to:email,subject:`Recibimos tu solicitud · ${code}`,html:`<h1>Recibimos tu solicitud</h1><p>${safeService}</p><p>${safeDate} · ${safeTime}</p><p>Folio: ${code}</p><p>Tu cita quedará confirmada cuando Makanuy te envíe la confirmación.</p>`})
   ]);
-  return json({id,folio:code,email,notificationSent:notifications.every(item=>item.ok)});
+  return json({id,folio:code,email,notificationSent:Boolean(calendar.ok)||notifications.every(item=>item.ok),calendarConnected:Boolean(calendar.ok)});
 };

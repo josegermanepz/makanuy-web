@@ -1,7 +1,7 @@
-import {SERVICES,json,readJson,clean,sendEmail,escapeHtml} from '../_shared.js';
+import {SERVICES,json,readJson,clean,sendEmail,escapeHtml,googleAutomation} from '../_shared.js';
 import {availableSlots,localDateTime,slotAvailable} from '../_schedule.js';
 
-const find=async(env,folio,email)=>env.DB.prepare('SELECT id,folio,service_id,service_name,date,start_at,end_at,name,email,phone,status FROM appointments WHERE folio=? AND lower(email)=lower(?)').bind(clean(folio,40),clean(email,180)).first();
+const find=async(env,folio,email)=>env.DB.prepare('SELECT id,folio,service_id,service_name,date,start_at,end_at,name,email,phone,status,calendar_event_id FROM appointments WHERE folio=? AND lower(email)=lower(?)').bind(clean(folio,40),clean(email,180)).first();
 const canChange=row=>['pending_confirmation','pending','confirmed'].includes(row.status)&&new Date(row.start_at).getTime()-Date.now()>=48*60*60*1000;
 const notify=async(env,row,subject,message)=>Promise.all([
   sendEmail(env,{to:env.BOOKING_EMAIL||'yunuen.preg@gmail.com',subject,html:`<p>${escapeHtml(message)}</p><p>${escapeHtml(row.service_name)} · ${escapeHtml(row.folio)}</p>`}),
@@ -24,7 +24,8 @@ export const onRequestPost=async({request,env})=>{
   if(!canChange(row))return json({error:'Los cambios en línea cierran 48 horas antes de la cita.'},400);
   if(body.action==='cancel'){
     await env.DB.prepare("UPDATE appointments SET status='cancelled',updated_at=datetime('now') WHERE id=?").bind(row.id).run();
-    await notify(env,row,`Cita cancelada · ${row.folio}`,'La cita fue cancelada.');
+    const calendar=await googleAutomation(env,{action:'cancel',eventId:row.calendar_event_id,folio:row.folio,guest:row.email,admin:env.BOOKING_EMAIL||'yunuen.preg@gmail.com',service:row.service_name});
+    if(!calendar.ok)await notify(env,row,`Cita cancelada · ${row.folio}`,'La cita fue cancelada.');
     return json({ok:true,message:'Tu cita fue cancelada. Enviamos el aviso por correo.'});
   }
   if(body.action==='reschedule'){
@@ -33,7 +34,8 @@ export const onRequestPost=async({request,env})=>{
     const start=localDateTime(date,time),startIso=start.toISOString(),endIso=new Date(start.getTime()+service.minutes*60000).toISOString();
     const result=await env.DB.prepare("UPDATE appointments SET date=?,start_at=?,end_at=?,status='pending_confirmation',updated_at=datetime('now') WHERE id=? AND NOT EXISTS (SELECT 1 FROM appointments WHERE id<>? AND status IN ('pending_confirmation','pending','confirmed') AND start_at < ? AND end_at > ?)").bind(date,startIso,endIso,row.id,row.id,endIso,startIso).run();
     if(!result.meta?.changes)return json({error:'Ese horario acaba de ocuparse. Elige otro.'},409);
-    await notify(env,{...row,date,start_at:startIso,end_at:endIso},`Solicitud de cambio · ${row.folio}`,`La cita cambió al ${date} a las ${time} y quedó pendiente de confirmación.`);
+    const calendar=await googleAutomation(env,{action:'update',eventId:row.calendar_event_id,title:`Makanuy · ${row.service_name}`,start:startIso,end:endIso,folio:row.folio,guest:row.email,admin:env.BOOKING_EMAIL||'yunuen.preg@gmail.com',service:row.service_name,date,time});
+    if(!calendar.ok)await notify(env,{...row,date,start_at:startIso,end_at:endIso},`Solicitud de cambio · ${row.folio}`,`La cita cambió al ${date} a las ${time} y quedó pendiente de confirmación.`);
     return json({ok:true,message:'Solicitamos el cambio. Recibirás la confirmación por correo.'});
   }
   return json({error:'Acción inválida.'},400);
