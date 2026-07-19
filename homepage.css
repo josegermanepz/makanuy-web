@@ -34,12 +34,4 @@
 .home-about img{width:100%;height:100%;object-fit:cover}
 .home-about__copy{display:flex;flex-direction:column;justify-content:center;padding:70px 9%}
 .home-about__copy h2{font-family:Montserrat,Arial,sans-serif!important;font-size:28px!important;font-weight:400!important;letter-spacing:.04em;margin:0 0 28px}
-.home-about__copy .mission{font-family:"Cormorant Garamond",Georgia,serif;font-size:36px;margin:0 0 20px}
-.home-about__copy p{font-size:18px;line-height:1.75;margin:0}
-.home-testimonials{padding:90px 24px 105px;text-align:center}
-.home-testimonial-grid{max-width:1150px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-.home-testimonial{background:#FAD7CF;padding:36px 30px;text-align:left}
-.home-testimonial blockquote{font-family:"Cormorant Garamond",Georgia,serif;font-size:22px;line-height:1.5;margin:0 0 24px}
-.home-testimonial cite{font-style:normal;font-weight:600}
-@media(max-width:900px){.home-hero{grid-template-columns:1fr}.home-hero__collage,.home-hero__photo{min-height:480px}.home-services{padding-top:80px}.home-service{grid-template-columns:78px minmax(0,1fr) 120px}.home-service__book{grid-column:2/4;justify-self:start}.home-instagram__grid{grid-template-columns:repeat(3,1fr)}.home-testimonial-grid{grid-template-columns:1fr}.home-about{grid-template-columns:1fr}.home-about img{max-height:560px}.home-recipe-grid{grid-template-columns:1fr}}
-@media(max-width:620px){.home-hero__collage,.home-hero__photo{min-height:390px}.home-hero__copy{top:22%;left:6%;right:6%}.home-hero__copy h1{font-size:43px}.home-hero__copy p{font-size:22px}.home-services{padding:65px 18px}.home-service{grid-template-columns:64px 1fr;gap:18px;padding:26px 0}.home-service img{width:62px;height:62px}.home-service h3{font-size:19px}.home-service__meta{grid-column:2}.home-service__book{grid-column:2;padding:10px 16px}.home-instagram__grid{grid-template-columns:1fr 1fr}.home-instagram__grid a:last-child{display:none}.home-about__copy{padding:55px 24px}.home-testimonials{padding-left:18px;padding-right:18px}}
+body:has(.home-wix) .site-header nav a[href="/index.html"]{background:#FAD7CF!important;color:#000!important}
