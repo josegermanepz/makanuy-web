@@ -1,0 +1,110 @@
+[
+  {
+    "id": "bienestar",
+    "slug": "consulta-bienestar-composición-corporal",
+    "name": "Consulta Bienestar/Composición Corporal",
+    "minutes": 60,
+    "price": 850,
+    "deposit": 250,
+    "location": "presencial"
+  },
+  {
+    "id": "hormonal",
+    "slug": "consulta-de-nutrición-hormonal",
+    "name": "Consulta de Nutrición Hormonal",
+    "minutes": 60,
+    "price": 850,
+    "deposit": 250,
+    "location": "presencial"
+  },
+  {
+    "id": "embarazo",
+    "slug": "consulta-de-embarazo",
+    "name": "Consulta de Embarazo",
+    "minutes": 60,
+    "price": 850,
+    "deposit": 250,
+    "location": "presencial"
+  },
+  {
+    "id": "climaterio",
+    "slug": "consulta-para-el-climaterio-y-menopausia",
+    "name": "Consulta para el Climaterio y Menopausia",
+    "minutes": 60,
+    "price": 850,
+    "deposit": 250,
+    "location": "presencial"
+  },
+  {
+    "id": "inmune",
+    "slug": "consulta-de-nutrición-y-sistema-inmune",
+    "name": "Consulta de Nutrición y Sistema Inmune",
+    "minutes": 60,
+    "price": 850,
+    "deposit": 250,
+    "location": "presencial"
+  },
+  {
+    "id": "tanita",
+    "slug": "tanita-bioempedancia",
+    "name": "Tanita (Bioempedancia)",
+    "minutes": 30,
+    "price": 300,
+    "deposit": 300,
+    "location": "presencial"
+  },
+  {
+    "id": "online",
+    "slug": "consulta-online-1",
+    "name": "Consulta Online",
+    "minutes": 60,
+    "price": 800,
+    "deposit": 250,
+    "location": "online"
+  },
+  {
+    "id": "lactancia",
+    "slug": "asesoría-de-lactancia",
+    "name": "Asesoría de Lactancia",
+    "minutes": 60,
+    "price": 350,
+    "deposit": 250,
+    "location": "presencial"
+  },
+  {
+    "id": "presencial",
+    "slug": "consulta-presencial",
+    "name": "Consulta Presencial",
+    "minutes": 60,
+    "price": 850,
+    "deposit": 250,
+    "location": "presencial"
+  },
+  {
+    "id": "adulto-mayor",
+    "slug": "consulta-para-adulto-mayor",
+    "name": "Consulta para Adulto Mayor",
+    "minutes": 60,
+    "price": 1000,
+    "deposit": 250,
+    "location": "presencial"
+  },
+  {
+    "id": "empresas",
+    "slug": "consultoría-nutricional-para-empresas",
+    "name": "Consultoría Nutricional para Empresas",
+    "minutes": 60,
+    "price": null,
+    "deposit": null,
+    "location": "por-definir"
+  },
+  {
+    "id": "familiar",
+    "slug": "consulta-familiar",
+    "name": "Consulta Familiar",
+    "minutes": 60,
+    "price": 2360,
+    "deposit": 250,
+    "location": "presencial"
+  }
+]
