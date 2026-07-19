@@ -44,3 +44,7 @@ footer{background:var(--ink);color:#fff;padding:70px 0 32px}footer a{color:#fff}
 .site-header nav a.nav-cta{background:var(--ink)!important;color:#fff!important;padding-inline:18px!important}
 @media(max-width:1080px){.site-header nav a{font-size:13px!important;padding-inline:9px!important}.site-header nav a.nav-cta{padding-inline:18px!important}}
 @media(max-width:820px){.site-header nav a{font-size:16px!important;padding:13px 16px!important}.site-header nav a.nav-cta{padding-inline:16px!important}}
+
+/* Stable system font metrics for the global header. */
+.site-header,.site-header .brand,.site-header nav,.site-header nav a,.menu-toggle{font-family:Arial,Helvetica,sans-serif!important;font-synthesis:none!important}
+.site-header .brand span{font-family:'Cormorant Garamond',Georgia,serif!important}
