@@ -4,8 +4,16 @@ export const readJson=async request=>{try{return await request.json()}catch{retu
 export const clean=(value,max=500)=>String(value??'').trim().slice(0,max);
 export const escapeHtml=value=>clean(value,5000).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 export const folio=(prefix='MK')=>prefix+'-'+new Date().toISOString().slice(0,10).replaceAll('-','')+'-'+crypto.randomUUID().slice(0,8).toUpperCase();
+export async function googleAutomation(env,payload){
+  if(!env.GOOGLE_AUTOMATION_URL||!env.GOOGLE_AUTOMATION_SECRET)return {skipped:true};
+  try{
+    const response=await fetch(env.GOOGLE_AUTOMATION_URL,{method:'POST',headers:{'content-type':'text/plain;charset=utf-8'},body:JSON.stringify({...payload,secret:env.GOOGLE_AUTOMATION_SECRET})});
+    const data=await response.json();
+    return {ok:response.ok&&data.ok,...data};
+  }catch{return {ok:false}}
+}
 export async function sendEmail(env,{to,subject,html}){
-  if(!env.RESEND_API_KEY)return {skipped:true};
+  if(!env.RESEND_API_KEY)return googleAutomation(env,{action:'email',to:Array.isArray(to)?to:[to],subject,html});
   const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+env.RESEND_API_KEY,'content-type':'application/json'},body:JSON.stringify({from:env.EMAIL_FROM||'Makanuy <reservas@makanuyconsultas.com>',to:Array.isArray(to)?to:[to],subject,html})});
   return {ok:response.ok,status:response.status};
 }
