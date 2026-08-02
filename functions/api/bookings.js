@@ -1,11 +1,13 @@
-import {SERVICES,json,readJson,clean,folio,sendEmail,escapeHtml,googleAutomation} from '../_shared.js';
+import {SERVICES,json,readJson,clean,folio,sendEmail,escapeHtml,googleAutomation,rateLimit,verifyTurnstile,CONSULTATION_POLICIES_HTML} from '../_shared.js';
 import {localDateTime,slotAvailable} from '../_schedule.js';
 
 export const onRequestPost=async({request,env})=>{
   if(!env.DB)return json({error:'La agenda temporalmente no está conectada. Escríbenos por WhatsApp.'},503);
+  const throttle=await rateLimit(env,request,'bookings',4,600);if(!throttle.ok)return json({error:'Recibimos demasiados intentos. Espera unos minutos e inténtalo de nuevo.'},429);
   const body=await readJson(request),service=SERVICES[body?.serviceId];
   if(!service)return json({error:'Servicio inválido'},400);
   if(clean(body?.companyWebsite))return json({error:'No fue posible procesar la solicitud.'},400);
+  if(!await verifyTurnstile(env,request,body?.turnstileToken))return json({error:'No pudimos validar la verificación de seguridad.'},400);
   for(const key of ['date','time','name','email','phone'])if(!clean(body?.[key]))return json({error:'Completa nombre, correo y teléfono.'},400);
   if(!body.privacy)return json({error:'Acepta el aviso de privacidad y la política de cancelación.'},400);
   if(!/^\S+@\S+\.\S+$/.test(clean(body.email,180)))return json({error:'Escribe un correo válido.'},400);
@@ -24,7 +26,7 @@ export const onRequestPost=async({request,env})=>{
   if(calendar.ok&&calendar.eventId)await env.DB.prepare('UPDATE appointments SET calendar_event_id=? WHERE id=?').bind(calendar.eventId,id).run();
   const notifications=calendar.ok?[]:await Promise.all([
     sendEmail(env,{to:env.BOOKING_EMAIL||'yunuen.preg@gmail.com',subject:`Nueva solicitud de cita · ${code}`,html:`<h1>Nueva solicitud de cita</h1><p><strong>${safeService}</strong></p><p>${safeDate} · ${safeTime}</p><p>${safeName}<br>${safeEmail}<br>${safePhone}</p><p>Folio: ${code}</p>`}),
-    sendEmail(env,{to:email,subject:`Recibimos tu solicitud · ${code}`,html:`<h1>Recibimos tu solicitud</h1><p>${safeService}</p><p>${safeDate} · ${safeTime}</p><p>Folio: ${code}</p><p>Tu cita quedará confirmada cuando Makanuy te envíe la confirmación.</p>`})
+    sendEmail(env,{to:email,subject:`Recibimos tu solicitud · ${code}`,html:`<h1>Recibimos tu solicitud</h1><p>${safeService}</p><p>${safeDate} · ${safeTime}</p><p>Folio: ${code}</p><p>Tu cita quedará confirmada cuando Makanuy te envíe la confirmación.</p>${CONSULTATION_POLICIES_HTML}`})
   ]);
   return json({id,folio:code,email,notificationSent:Boolean(calendar.ok)||notifications.every(item=>item.ok),calendarConnected:Boolean(calendar.ok)});
 };

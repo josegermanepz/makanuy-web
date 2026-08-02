@@ -1,0 +1,17 @@
+pagina,archivo,url_canonica,menu,funcion_principal,estado_v5
+Inicio,index.html,https://www.makanuyconsultas.com/,Sí,Presentación y rutas de conversión,Validada
+Consulta nutricional,servicios.html,https://www.makanuyconsultas.com/servicios/,Sí,Catálogo de 7 servicios autorizados,Validada
+Nutrición para mujeres,nutricion-mujer.html,https://www.makanuyconsultas.com/nutricion-mujer/,Sí,Etapas y acompañamientos,Validada
+Sobre Yunuen,sobre-yunuen.html,https://www.makanuyconsultas.com/yunuen-figueroa/,Sí,Perfil y enfoque profesional,Validada
+Empresas,empresas.html,https://www.makanuyconsultas.com/empresas/,Sí,Oferta B2B y formulario,Validada
+Recursos,recursos.html,https://www.makanuyconsultas.com/recursos/,Sí,Entrada a recetarios marcas y calculadoras,Validada
+Marcas recomendadas,recomendaciones.html,https://www.makanuyconsultas.com/recomendaciones/,No,Buscador porciones y calculadoras,Validada
+Recetarios,recetas.html,https://www.makanuyconsultas.com/recetas/,No,Índice de recetarios,Validada
+Agenda,agendar.html,https://www.makanuyconsultas.com/agendar/,Sí,Disponibilidad y solicitud de cita,Validada
+Gestionar cita,gestionar-cita.html,https://www.makanuyconsultas.com/gestionar-cita/,No,Consulta cancelación y reprogramación,Validada
+Contacto,contacto.html,https://www.makanuyconsultas.com/contacto/,No,Canales ubicación y formulario general,Mejorada
+Preguntas frecuentes,preguntas-frecuentes.html,https://www.makanuyconsultas.com/preguntas-frecuentes/,No,Resolver objeciones y políticas,Validada
+Referidos,referidos.html,https://www.makanuyconsultas.com/referidos/,No,Compartir enlace sin datos de terceros,Validada
+Privacidad,privacidad.html,https://www.makanuyconsultas.com/privacidad/,No,Aviso de privacidad,Validada
+Términos,terminos.html,https://www.makanuyconsultas.com/terminos/,No,Términos del servicio,Validada
+Cookies,cookies.html,https://www.makanuyconsultas.com/cookies/,No,Información de almacenamiento local,Validada
