@@ -1,3 +1,18 @@
-import{json,readJson,clean,folio,sendEmail}from'../_shared.js';
+import{json,readJson,clean,folio,sendEmail,rateLimit,verifyTurnstile,escapeHtml}from'../_shared.js';
 const emailOk=value=>/^\S+@\S+\.\S+$/.test(clean(value,180));
-export const onRequestPost=async({request,env})=>{if(!env.DB)return json({error:'El formulario temporalmente no está conectado. Escríbenos por WhatsApp.'},503);const length=Number(request.headers.get('content-length')||0);if(length>12000)return json({error:'La solicitud es demasiado extensa.'},413);const b=await readJson(request);if(!b||clean(b.companyWebsite))return json({error:'No fue posible procesar la solicitud.'},400);if(b.type!=='corporate')return json({error:'Tipo de formulario inválido.'},400);if(!clean(b.company)||!clean(b.name)||!emailOk(b.email)||!clean(b.message)||!b.privacy)return json({error:'Completa los campos requeridos y acepta el aviso de privacidad.'},400);const code=folio('EMP');const safe={type:'corporate',company:clean(b.company,160),name:clean(b.name,120),email:clean(b.email,180),phone:clean(b.phone,40),employees:clean(b.employees,12),format:clean(b.format,40),message:clean(b.message,1200)};await env.DB.prepare("INSERT INTO form_submissions(id,folio,type,name,email,phone,payload,created_at) VALUES(?,?,?,?,?,?,?,datetime('now'))").bind(crypto.randomUUID(),code,'corporate',safe.name,safe.email,safe.phone,JSON.stringify(safe)).run();await sendEmail(env,{to:env.BUSINESS_EMAIL||'yunuen.preg@gmail.com',subject:'Solicitud empresarial · '+code,html:'<pre>'+JSON.stringify(safe,null,2).replaceAll('<','&lt;')+'</pre>'});return json({ok:true,folio:code});};
+export const onRequestPost=async({request,env})=>{
+  if(!env.DB)return json({error:'El formulario temporalmente no está conectado. Escríbenos por WhatsApp.'},503);
+  const length=Number(request.headers.get('content-length')||0);if(length>12000)return json({error:'La solicitud es demasiado extensa.'},413);
+  const throttle=await rateLimit(env,request,'forms',5,600);if(!throttle.ok)return json({error:'Recibimos demasiados intentos. Espera unos minutos e inténtalo de nuevo.'},429);
+  const b=await readJson(request);if(!b||clean(b.companyWebsite))return json({error:'No fue posible procesar la solicitud.'},400);
+  if(!await verifyTurnstile(env,request,b.turnstileToken))return json({error:'No pudimos validar la verificación de seguridad.'},400);
+  if(!['corporate','contact'].includes(b.type))return json({error:'Tipo de formulario inválido.'},400);
+  if(!clean(b.name)||!emailOk(b.email)||!clean(b.message)||!b.privacy||(b.type==='corporate'&&!clean(b.company)))return json({error:'Completa los campos requeridos y acepta el aviso de privacidad.'},400);
+  const code=folio(b.type==='corporate'?'EMP':'CON');
+  const safe={type:b.type,company:clean(b.company,160),name:clean(b.name,120),email:clean(b.email,180),phone:clean(b.phone,40),employees:clean(b.employees,12),format:clean(b.format,40),message:clean(b.message,1200)};
+  await env.DB.prepare("INSERT INTO form_submissions(id,folio,type,name,email,phone,payload,created_at) VALUES(?,?,?,?,?,?,?,datetime('now'))").bind(crypto.randomUUID(),code,safe.type,safe.name,safe.email,safe.phone,JSON.stringify(safe)).run();
+  const title=safe.type==='corporate'?'Solicitud empresarial':'Mensaje desde el sitio';
+  const lines=[safe.company&&`<p><strong>Empresa:</strong> ${escapeHtml(safe.company)}</p>`,`<p><strong>Nombre:</strong> ${escapeHtml(safe.name)}<br><strong>Correo:</strong> ${escapeHtml(safe.email)}<br><strong>Teléfono:</strong> ${escapeHtml(safe.phone||'No proporcionado')}</p>`,`<p><strong>Mensaje:</strong><br>${escapeHtml(safe.message)}</p>`].filter(Boolean).join('');
+  await sendEmail(env,{to:env.BUSINESS_EMAIL||'yunuen.preg@gmail.com',subject:`${title} · ${code}`,html:`<h1>${title}</h1>${lines}<p>Folio: ${code}</p>`});
+  return json({ok:true,folio:code});
+};
