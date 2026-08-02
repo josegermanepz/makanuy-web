@@ -105,12 +105,15 @@ def main() -> None:
         'recursos.html': {
             'src="/image-031.jpg" alt="Agua mineral"': 'src="/assets/images/calculator-water-v2.png" alt="Calculadora educativa de consumo de agua"',
             '<body><a class="skip"': '<body class="resources-page"><a class="skip"',
+            'href="/v5.css"': 'href="/v5.css?v=20260802a"',
         },
         'recomendaciones.html': {
             '<body><a class="skip"': '<body class="recommendations-page"><a class="skip"',
             'src="/image-033.png" alt="Avena"': 'src="/assets/images/avena-quaker-oats.png" alt="Quaker Oats hojuelas de avena integral"',
+            'href="/v5.css"': 'href="/v5.css?v=20260802a"',
         },
         'index.html': {
+            'href="/v5.css"': 'href="/v5.css?v=20260802a"',
             '<p class="lead">En Makanuy construimos una estrategia que considera tu etapa de vida, tus objetivos, tus hábitos y tu rutina. Con educación nutricional, acompañamiento y cambios que puedas sostener. El paciente no tiene que adaptarse a la comida: la alimentación se adapta a la persona.</p>': (
                 '<p class="lead hero-intro"><span class="hero-intro__desktop">En Makanuy construimos una estrategia que considera tu etapa de vida, tus objetivos, tus hábitos y tu rutina. Con educación nutricional, acompañamiento y cambios que puedas sostener. El paciente no tiene que adaptarse a la comida: la alimentación se adapta a la persona.</span>'
                 '<span class="hero-intro__mobile">En Makanuy creamos una estrategia para tu vida, hábitos y objetivos. La alimentación se adapta a ti, no tú a la comida.</span></p>'
