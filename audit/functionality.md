@@ -8,13 +8,13 @@
 - Genera folio, evento de Google Calendar y notificaciones.
 - Permite cancelar o reprogramar hasta 24 horas antes.
 - No procesa pagos y los endpoints históricos responden como deshabilitados.
-- Se añadió límite de intentos y soporte opcional para Cloudflare Turnstile.
+- Se añadió límite de intentos y Cloudflare Turnstile activo en producción y previews autorizados.
 
 ## Formularios
 
 - Empresas: guarda folio y datos en D1 y envía notificación.
 - Contacto: nuevo formulario de orientación general, con aviso para no enviar información clínica.
-- Ambos usan validación cliente/servidor, honeypot, límite de tamaño, rate limiting y Turnstile cuando se configuren sus claves.
+- Ambos usan validación cliente/servidor, honeypot, límite de tamaño, rate limiting y Turnstile con validación server-side.
 - Referidos no recopila datos de terceras personas: únicamente crea un enlace para compartir.
 
 ## Recursos
@@ -32,7 +32,7 @@
 - Mercado Pago/pagos: intencionalmente deshabilitados.
 - Wix: ninguna imagen, script, estilo o función se carga en tiempo de ejecución.
 
-## Acciones de cuenta todavía necesarias
+## Configuración que debe conservarse
 
-- Crear un widget Turnstile y guardar `TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY` en Cloudflare para activar el reto anti-bot.
-- Mantener vigentes `GOOGLE_AUTOMATION_URL`, `GOOGLE_AUTOMATION_SECRET`, `GOOGLE_CALENDAR_ICS_URL` y el binding `DB` en producción y previews.
+- El widget Turnstile **Makanuy formularios y agenda**, sus hostnames y los secretos de producción/preview.
+- `GOOGLE_AUTOMATION_URL`, `GOOGLE_AUTOMATION_SECRET`, `GOOGLE_CALENDAR_ICS_URL` y el binding `DB` en producción y previews.
