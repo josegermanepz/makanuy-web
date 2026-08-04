@@ -3,6 +3,7 @@
 
 from pathlib import Path
 import html
+import json
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,6 +67,12 @@ def dedupe_metadata(source: str) -> str:
     return re.sub(r'<meta\b[^>]*>', replace, source, flags=re.I)
 
 
+def inject_schema(source: str, schema: dict) -> str:
+    source = re.sub(r'<script type="application/ld\+json" data-makanuy-schema>.*?</script>', '', source, flags=re.S | re.I)
+    payload = json.dumps(schema, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+    return source.replace('</head>', f'<script type="application/ld+json" data-makanuy-schema>{payload}</script></head>', 1)
+
+
 def main() -> None:
     services = (ROOT / 'servicios.html').read_text()
     style_match = re.search(r'<style>(.*?)</style>', services, re.S | re.I)
@@ -74,6 +81,7 @@ def main() -> None:
 
     for path in HTML_FILES:
         source = path.read_text()
+        source = re.sub(r'<script defer>const t=document\.querySelector\(\'\.menu-toggle\'\).*?</script>', '', source, flags=re.S)
         match = re.search(r'<style>(.*?)</style>', source, re.S | re.I)
         if match and match.group(1).startswith(base):
             remainder = match.group(1)[len(base):]
@@ -85,10 +93,20 @@ def main() -> None:
                 source = source.replace(marker, link + marker, 1)
 
         if '/v5.css' not in source:
-            source = source.replace('</head>', '<link rel="stylesheet" href="/v5.css"></head>', 1)
+            source = source.replace('</head>', '<link rel="stylesheet" href="/v5.css?v=20260804a"></head>', 1)
+        else:
+            source = re.sub(r'href="/v5\.css(?:\?[^\"]*)?"', 'href="/v5.css?v=20260804a"', source)
         source = add_social_metadata(source)
         source = dedupe_metadata(source)
         source = upgrade_images(source)
+        if '<header class="site-header">' in source and 'class="menu-toggle"' not in source:
+            source = source.replace('<nav id="menu"', '<button class="menu-toggle" aria-expanded="false" aria-controls="menu">Menú</button><nav id="menu"', 1)
+        if '/analytics.js' not in source:
+            enhancements = '<script src="/site-enhancements.js" defer></script>'
+            if enhancements in source:
+                source = source.replace(enhancements, '<script src="/analytics.js" defer></script>' + enhancements, 1)
+            else:
+                source = source.replace('</body>', '<script src="/analytics.js" defer></script></body>', 1)
         if ('data-api-form=' in source or 'id="booking-form"' in source) and '/turnstile.js' not in source:
             source = source.replace('</body>', '<script src="/turnstile.js" defer></script></body>', 1)
         path.write_text(source)
@@ -103,7 +121,44 @@ def main() -> None:
             'src="/image-001.png" alt="Tostadas': 'src="/receta-tostadas.avif" alt="Tostadas',
         },
         'recursos.html': {
-            'src="/image-031.jpg" alt="Agua mineral"': 'src="/assets/images/calculator-water-v2.png" alt="Calculadora educativa de consumo de agua"',
+            'src="/image-031.jpg" alt="Agua mineral"': 'src="/assets/images/calculator-water-v2.webp" alt="Calculadora educativa de consumo de agua"',
+            'src="/assets/images/calculator-water-v2.png"': 'src="/assets/images/calculator-water-v2.webp"',
+            '<body><a class="skip"': '<body class="resources-page"><a class="skip"',
+        },
+        'recomendaciones.html': {
+            '<body><a class="skip"': '<body class="recommendations-page"><a class="skip"',
+            "url('/image-027.png')": "url('/assets/images/recommendations-hero.webp')",
+            'src="/image-033.png" alt="Avena"': 'src="/assets/images/avena-quaker-oats.webp" alt="Quaker Oats hojuelas de avena integral"',
+            'src="/assets/images/avena-quaker-oats.png"': 'src="/assets/images/avena-quaker-oats.webp"',
+            'src="/assets/images/calculator-water-v2.png"': 'src="/assets/images/calculator-water-v2.webp"',
+            'src="/assets/images/calculator-equivalents-v2.png"': 'src="/assets/images/calculator-equivalents-v2.webp"',
+            '<section class="section"><h2>Alimentos</h2>': '<section class="section"><div class="review-note"><strong>Guía revisada en agosto de 2026</strong><p>La selección considera practicidad, disponibilidad y características generales del producto. No existe una marca obligatoria y la mejor elección depende del contexto y del plan individual.</p></div><h2>Alimentos</h2>',
+            '<script src="/site-ui.js" defer></script>': '<script src="/recommendations-ui.js" defer></script><script src="/site-ui.js" defer></script>',
+        },
+        'index.html': {
+            'src="/image-059.jpg" alt="Alimentos variados para una consulta de bienestar"': 'src="/assets/images/service-bienestar-cover.webp" alt="Alimentos variados para una consulta de bienestar"',
+            'src="/image-014.jpg" alt="Mujeres en diferentes etapas de vida"': 'src="/assets/images/service-women-cover.webp" alt="Mujeres en diferentes etapas de vida"',
+            'src="/image-060.jpg" alt="Alimentación equilibrada para acompañamiento nutricional en línea"': 'src="/assets/images/service-online-cover.webp" alt="Alimentación equilibrada para acompañamiento nutricional en línea"',
+            '<p class="lead">En Makanuy construimos una estrategia que considera tu etapa de vida, tus objetivos, tus hábitos y tu rutina. Con educación nutricional, acompañamiento y cambios que puedas sostener. El paciente no tiene que adaptarse a la comida: la alimentación se adapta a la persona.</p>': (
+                '<p class="lead hero-intro"><span class="hero-intro__desktop">En Makanuy construimos una estrategia que considera tu etapa de vida, tus objetivos, tus hábitos y tu rutina. Con educación nutricional, acompañamiento y cambios que puedas sostener. El paciente no tiene que adaptarse a la comida: la alimentación se adapta a la persona.</span>'
+                '<span class="hero-intro__mobile">En Makanuy creamos una estrategia para tu vida, hábitos y objetivos. La alimentación se adapta a ti, no tú a la comida.</span></p>'
+            ),
+        },
+        'agendar.html': {
+            '<section data-booking-stage="date" hidden><h2>Selecciona fecha y hora</h2>': '<section data-booking-stage="date" hidden><h2 tabindex="-1">Selecciona fecha y hora</h2><p class="booking-timezone">Horarios de Ciudad de México (UTC−6). La disponibilidad se consulta directamente en el calendario de Yunuen.</p><button class="button booking-next-slot" type="button" data-find-next>Buscar el próximo horario</button>',
+            '<section data-booking-stage="details" hidden><h2>Datos para confirmar</h2>': '<section data-booking-stage="details" hidden><h2 tabindex="-1">Datos para confirmar</h2><p id="chosen-booking" class="chosen-booking"></p>',
+            '<section data-booking-stage="service"><h2>Elige el acompañamiento</h2>': '<section data-booking-stage="service"><h2 tabindex="-1">Elige el acompañamiento</h2>',
+            '<div class="success"><h2>Recibimos tu solicitud</h2>': '<div class="success"><h2 tabindex="-1">Recibimos tu solicitud</h2>',
+        },
+        'cookies.html': {
+            'Última actualización: 19 de julio de 2026': 'Última actualización: 4 de agosto de 2026',
+            '<p>El sitio utiliza únicamente recursos técnicos necesarios para navegación, seguridad y funcionamiento de la agenda. No se utiliza analítica publicitaria ni se crean perfiles de publicidad en esta versión.</p>': '<p>El sitio utiliza recursos técnicos necesarios para navegación, seguridad y funcionamiento de la agenda. También registra medición agregada y propia —por ejemplo, la página visitada y las acciones principales— sin cookies publicitarias, sin almacenar la dirección IP y sin crear perfiles personales.</p>',
+            '<h2>Si se activa medición</h2><p>Antes de habilitar cookies o identificadores no esenciales, la página ofrecerá una opción para aceptar o rechazar y esta política indicará el proveedor, finalidad y duración.</p>': '<h2>Medición sin cookies</h2><p>Los eventos técnicos se conservan hasta 90 días para comprender el uso del sitio y detectar fallas. Si posteriormente se habilitan cookies o identificadores no esenciales, la página ofrecerá una opción para aceptar o rechazar.</p>',
+        },
+        'privacidad.html': {
+            'Última actualización: 19 de julio de 2026': 'Última actualización: 4 de agosto de 2026',
+            '<li>Prevenir abuso y mantener la seguridad del sitio.</li>': '<li>Prevenir abuso y mantener la seguridad del sitio.</li><li>Analizar de forma agregada el uso de las páginas y las acciones principales, sin registrar diagnósticos ni contenidos escritos en formularios.</li>',
+            '<p>La información se conserva durante el tiempo necesario para atender la solicitud y cumplir obligaciones aplicables. El acceso se limita a Makanuy y a los proveedores necesarios para operar el servicio.</p>': '<p>La información se conserva durante el tiempo necesario para atender la solicitud y cumplir obligaciones aplicables. Los eventos técnicos y anónimos del sitio se eliminan después de 90 días. El acceso se limita a Makanuy y a los proveedores necesarios para operar el servicio.</p>',
         },
     }
     for filename, changes in replacements.items():
@@ -111,6 +166,7 @@ def main() -> None:
         source = path.read_text()
         for old, new in changes.items():
             source = source.replace(old, new)
+        source = source.replace('<script src="/recommendations-ui.js" defer></script><script src="/recommendations-ui.js" defer></script>', '<script src="/recommendations-ui.js" defer></script>')
         path.write_text(source)
 
     contact = ROOT / 'contacto.html'
@@ -153,6 +209,65 @@ def main() -> None:
     if 'name="robots"' not in source:
         source = source.replace('</head>', '<meta name="robots" content="noindex,follow"></head>', 1)
     legacy_quiz.write_text(source)
+
+    faq = ROOT / 'preguntas-frecuentes.html'
+    source = faq.read_text()
+    entries = re.findall(r'<details[^>]*>\s*<summary>(.*?)</summary>\s*<p>(.*?)</p>', source, re.S | re.I)
+    faq_schema = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': [
+            {
+                '@type': 'Question',
+                'name': re.sub(r'<[^>]+>', '', question).strip(),
+                'acceptedAnswer': {'@type': 'Answer', 'text': re.sub(r'<[^>]+>', '', answer).strip()},
+            }
+            for question, answer in entries
+        ],
+    }
+    faq.write_text(inject_schema(source, faq_schema))
+
+    about = ROOT / 'sobre-yunuen.html'
+    about_schema = {
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        'name': 'Yunuen Figueroa González',
+        'jobTitle': 'Nutrióloga',
+        'url': 'https://www.makanuyconsultas.com/yunuen-figueroa/',
+        'worksFor': {'@type': 'ProfessionalService', 'name': 'Makanuy'},
+        'sameAs': ['https://www.instagram.com/yunfig/'],
+    }
+    about.write_text(inject_schema(about.read_text(), about_schema))
+
+    service_pages = {
+        'servicios-consulta-bienestar-composicion-corporal.html': ('Consulta Bienestar/Composición Corporal', 850),
+        'servicios-consulta-de-nutricion-hormonal.html': ('Consulta de Nutrición Hormonal', 850),
+        'servicios-consulta-de-embarazo.html': ('Consulta de Embarazo', 850),
+        'servicios-consulta-para-el-climaterio-y-menopausia.html': ('Consulta para el Climaterio y Menopausia', 850),
+        'servicios-consulta-de-nutricion-y-sistema-inmune.html': ('Consulta de Nutrición y Sistema Inmune', 850),
+        'servicios-tanita-bioempedancia.html': ('Tanita (Bioimpedancia)', 300),
+        'servicios-consulta-online-1.html': ('Consulta Online', 800),
+    }
+    for filename, (name, price) in service_pages.items():
+        path = ROOT / filename
+        canonical = attr(re.search(r'<link rel="canonical"[^>]*>', path.read_text()).group(0), 'href')
+        schema = {
+            '@context': 'https://schema.org', '@type': 'Service', 'name': name,
+            'url': canonical, 'provider': {'@type': 'ProfessionalService', 'name': 'Makanuy'},
+            'areaServed': 'México',
+            'offers': {'@type': 'Offer', 'price': price, 'priceCurrency': 'MXN', 'availability': 'https://schema.org/InStock'},
+        }
+        path.write_text(inject_schema(path.read_text(), schema))
+
+    recipes = ROOT / 'recetas.html'
+    recipe_list_schema = {
+        '@context': 'https://schema.org', '@type': 'ItemList', 'name': 'Recetarios Makanuy',
+        'itemListElement': [
+            {'@type': 'ListItem', 'position': 1, 'url': 'https://www.makanuyconsultas.com/recetas/rollitos-del-mar/', 'name': 'Rollitos del Mar'},
+            {'@type': 'ListItem', 'position': 2, 'url': 'https://www.makanuyconsultas.com/recetas/tostadas-crunch-de-atun-tropical/', 'name': 'Tostadas Crunch de Atún Tropical'},
+        ],
+    }
+    recipes.write_text(inject_schema(recipes.read_text(), recipe_list_schema))
 
 
 if __name__ == '__main__':

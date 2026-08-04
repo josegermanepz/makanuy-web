@@ -1,0 +1,19 @@
+name: Comprobar sitio Makanuy
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 14 * * *'
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Revisar páginas principales
+        run: |
+          set -euo pipefail
+          for path in / /servicios /nutricion-mujer /agendar /recursos /recomendaciones; do
+            curl --fail --silent --show-error --retry 2 "https://www.makanuyconsultas.com${path}" >/dev/null
+          done
+      - name: Revisar agenda, calendario y base de datos
+        run: curl --fail --silent --show-error --retry 2 https://www.makanuyconsultas.com/api/health
