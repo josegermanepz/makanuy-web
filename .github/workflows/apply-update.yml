@@ -5,7 +5,7 @@ on:
     branches:
       - mejoras-integrales-v5
     paths:
-      - makanuy-complete-update.zip
+      - makanuy-complete-update-2.zip
 
 permissions:
   contents: write
@@ -20,8 +20,8 @@ jobs:
           fetch-depth: 0
       - name: Aplicar archivos validados
         run: |
-          unzip -o makanuy-complete-update.zip
-          rm -f makanuy-complete-update.zip .github/workflows/apply-update.yml
+          unzip -o makanuy-complete-update-2.zip
+          rm -f makanuy-complete-update-2.zip .github/workflows/apply-update.yml .github/workflows/site-health.yml
           git config user.name "Makanuy Automation"
           git config user.email "actions@users.noreply.github.com"
           git add -A
