@@ -2,6 +2,9 @@ import {SERVICES,json,readJson,clean,folio,sendEmail,escapeHtml,rateLimit,verify
 
 export const onRequestPost=async({request,env})=>{
   if(!env.DB)return json({error:'La lista de espera no está disponible temporalmente.'},503);
+  try{
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS waitlist_requests (id TEXT PRIMARY KEY,folio TEXT UNIQUE NOT NULL,service_id TEXT NOT NULL,service_name TEXT NOT NULL,name TEXT NOT NULL,email TEXT NOT NULL,phone TEXT,preferred_date TEXT,status TEXT NOT NULL DEFAULT 'active',created_at TEXT NOT NULL)").run();
+  }catch{return json({error:'La lista de espera no está disponible temporalmente.'},503)}
   const throttle=await rateLimit(env,request,'waitlist',3,900);
   if(!throttle.ok)return json({error:'Recibimos demasiados intentos. Espera unos minutos.'},429);
   const body=await readJson(request),service=SERVICES[body?.serviceId];
