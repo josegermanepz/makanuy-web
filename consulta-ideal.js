@@ -1,0 +1,44 @@
+(() => {
+  const root = document.querySelector('[data-consultation-quiz]');
+  if (!root) return;
+  const stages = [...root.querySelectorAll('[data-quiz-stage]')];
+  const progress = root.querySelector('.quiz-progress span');
+  const status = root.querySelector('#quiz-status');
+  let goal = '';
+  const recommendations = {
+    bienestar: { title: 'Bienestar y composición corporal', copy: 'Una estrategia personalizada para trabajar hábitos, energía, peso o masa muscular sin dietas extremas.', detail: '/servicios-consulta-bienestar-composicion-corporal.html', service: 'bienestar', image: '/assets/images/service-bienestar-cover.webp' },
+    hormonal: { title: 'Consulta de nutrición hormonal', copy: 'Acompañamiento nutricional adaptado a síntomas, objetivos y contexto, en coordinación médica cuando corresponde.', detail: '/servicios-consulta-de-nutricion-hormonal.html', service: 'hormonal', image: '/servicio-hormonal.avif' },
+    embarazo: { title: 'Consulta de nutrición en embarazo', copy: 'Una estrategia realista y segura que considera trimestre, síntomas, hábitos y necesidades individuales.', detail: '/servicios-consulta-de-embarazo.html', service: 'embarazo', image: '/servicio-embarazo.avif' },
+    climaterio: { title: 'Consulta para climaterio y menopausia', copy: 'Acompañamiento para alimentación, bienestar y composición corporal durante esta etapa de vida.', detail: '/servicios-consulta-para-el-climaterio-y-menopausia.html', service: 'climaterio', image: '/servicio-climaterio.avif' },
+    inmune: { title: 'Nutrición y bienestar inmunológico', copy: 'Orientación alimentaria responsable como parte de un abordaje integral, sin sustituir la atención médica.', detail: '/servicios-consulta-de-nutricion-y-sistema-inmune.html', service: 'inmune', image: '/servicio-inmune.avif' },
+    tanita: { title: 'Bioimpedancia Tanita', copy: 'Una medición breve de composición corporal, acompañada de indicaciones de preparación y lectura responsable.', detail: '/servicios-tanita-bioempedancia.html', service: 'tanita', image: '/servicio-tanita.avif' },
+    online: { title: 'Consulta nutricional en línea', copy: 'Acompañamiento personalizado desde donde estés, con un proceso claro y materiales digitales.', detail: '/servicios-consulta-online-1.html', service: 'online', image: '/assets/images/service-online-cover.webp' }
+  };
+  const show = name => {
+    stages.forEach(stage => { stage.hidden = stage.dataset.quizStage !== name; });
+    const step = name === 'goal' ? 1 : 2;
+    progress.style.width = `${step * 50}%`;
+    status.textContent = name === 'result' ? 'Tu resultado' : `Pregunta ${step} de 2`;
+    root.querySelector(`[data-quiz-stage="${name}"] h2`)?.focus({ preventScroll: true });
+  };
+  root.querySelectorAll('[data-goal]').forEach(button => button.addEventListener('click', () => {
+    goal = button.dataset.goal;
+    root.querySelectorAll('[data-goal]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event: 'quiz_answer', data: { label: goal } } }));
+    show('mode');
+  }));
+  root.querySelectorAll('[data-mode]').forEach(button => button.addEventListener('click', () => {
+    const mode = button.dataset.mode;
+    const result = mode === 'online' && goal !== 'tanita' ? recommendations.online : recommendations[goal];
+    root.querySelector('#quiz-result-title').textContent = result.title;
+    root.querySelector('#quiz-result-copy').textContent = result.copy + (mode === 'online' && !['bienestar', 'tanita'].includes(goal) ? ' Comenta tu objetivo especializado al solicitarla.' : '');
+    root.querySelector('#quiz-result-detail').href = result.detail;
+    root.querySelector('#quiz-result-book').href = `/agendar.html?servicio=${encodeURIComponent(result.service)}`;
+    root.querySelector('#quiz-result-image').src = result.image;
+    root.querySelector('#quiz-result-image').alt = result.title;
+    document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event: 'quiz_complete', data: { service_id: result.service, label: mode } } }));
+    show('result');
+  }));
+  root.querySelector('[data-quiz-back]')?.addEventListener('click', () => show('goal'));
+  root.querySelector('[data-quiz-reset]')?.addEventListener('click', () => { goal = ''; root.querySelectorAll('.quiz-option').forEach(item => item.removeAttribute('aria-pressed')); show('goal'); });
+})();

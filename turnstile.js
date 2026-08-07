@@ -9,7 +9,7 @@
     script.onload=()=>forms.forEach(form=>{
       const mount=document.createElement('div');mount.className='cf-turnstile';
       form.querySelector('[type="submit"]')?.before(mount);
-      window.turnstile.render(mount,{sitekey:config.turnstileSiteKey,theme:'light',language:'es'});
+      form.dataset.turnstileWidget=String(window.turnstile.render(mount,{sitekey:config.turnstileSiteKey,theme:'light',language:'es'}));
     });
     document.head.append(script);
   }).catch(()=>{});
