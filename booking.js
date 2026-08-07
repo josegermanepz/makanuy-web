@@ -51,6 +51,13 @@
   const slots = document.querySelector('#slot-grid');
   const next = document.querySelector('[data-next="details"]');
   const findNext = document.querySelector('[data-find-next]');
+  const dateStage = document.querySelector('[data-booking-stage="date"]');
+  const waitlist = document.createElement('section');
+  waitlist.className = 'waitlist-card';
+  waitlist.hidden = true;
+  waitlist.innerHTML = `<h3>No encontraste un horario adecuado</h3><p>Déjanos tus datos y te avisaremos si se abre un espacio. Esto no confirma una cita.</p><form id="waitlist-form" data-api-form="waitlist" method="post"><label class="hp-field" aria-hidden="true">Sitio web<input name="companyWebsite" tabindex="-1" autocomplete="off"></label><div class="form-grid"><label>Nombre<input required name="name" autocomplete="name" maxlength="120"></label><label>Correo<input required type="email" name="email" autocomplete="email" maxlength="180"></label><label class="wide">Teléfono (opcional)<input type="tel" name="phone" autocomplete="tel" maxlength="40"></label></div><label><input style="width:auto;min-height:auto" required type="checkbox" name="privacy"> Leí el <a href="/privacidad.html" target="_blank" rel="noopener">aviso de privacidad</a>.</label><button class="button dark" type="submit">Unirme a la lista de espera</button><p class="form-status" role="status" aria-live="polite"></p></form>`;
+  dateStage?.append(waitlist);
+  const showWaitlist = () => { waitlist.hidden = false; waitlist.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
   if (date) {
     date.min = today();
     const max = new Date();
@@ -68,7 +75,8 @@
     if (!response.ok) throw new Error(data.error || 'No fue posible consultar horarios');
     slots.innerHTML = data.slots.length
       ? data.slots.map(time => `<button class="slot" type="button" data-time="${time}" aria-pressed="false">${time}</button>`).join('')
-      : '<p class="empty-state">No hay horarios disponibles en esta fecha. Prueba otro día.</p>';
+      : '<p class="empty-state">No hay horarios disponibles en esta fecha. Prueba otro día o únete a la lista de espera.</p>';
+    if (!data.slots.length) waitlist.hidden = false;
     slots.querySelectorAll('[data-time]').forEach(button => button.addEventListener('click', () => {
       slots.querySelectorAll('[data-time]').forEach(item => item.setAttribute('aria-pressed', 'false'));
       button.setAttribute('aria-pressed', 'true');
@@ -106,7 +114,8 @@
           return;
         }
       }
-      message('No encontramos horarios en los próximos 21 días. Puedes probar una fecha posterior o escribirnos por WhatsApp.', true);
+      message('No encontramos horarios en los próximos 21 días. Puedes probar una fecha posterior o unirte a la lista de espera.', true);
+      showWaitlist();
     } catch (error) {
       message(error.message, true);
     } finally {
@@ -127,7 +136,7 @@
     const submit = event.currentTarget.querySelector('[type="submit"]');
     submit.disabled = true;
     const fields = Object.fromEntries(new FormData(event.currentTarget));
-    fields.turnstileToken = window.turnstile?.getResponse() || '';
+    fields.turnstileToken = window.turnstile?.getResponse(event.currentTarget.dataset.turnstileWidget) || '';
     message('Guardando tu solicitud…');
     try {
       const response = await fetch('/api/bookings', {
@@ -144,7 +153,7 @@
     } catch (error) {
       message(error.message, true);
       track('booking_error', { service_id: state.service?.id || '', status: String(error.message).slice(0, 80) });
-      window.turnstile?.reset();
+      window.turnstile?.reset(event.currentTarget.dataset.turnstileWidget);
       submit.disabled = false;
     }
   });
@@ -154,4 +163,23 @@
     const item = services.find(service => service.slug === requested || service.id === requested);
     document.querySelector(`[data-service="${item?.id || ''}"]`)?.click();
   }
+
+  document.querySelector('#waitlist-form')?.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!state.service) return message('Selecciona primero una consulta.', true);
+    const form = event.currentTarget, submit = form.querySelector('[type="submit"]'), status = form.querySelector('.form-status');
+    submit.disabled = true; status.textContent = 'Registrando…'; status.className = 'form-status';
+    const fields = Object.fromEntries(new FormData(form));
+    fields.turnstileToken = window.turnstile?.getResponse(form.dataset.turnstileWidget) || '';
+    try {
+      const response = await fetch('/api/waitlist', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...fields, serviceId: state.service.id, preferredDate: state.date || '' }) });
+      const data = await response.json(); if (!response.ok) throw new Error(data.error || 'No pudimos registrarte');
+      status.textContent = `${data.message} Folio ${data.folio}.`; status.className = 'form-status success'; form.reset();
+      document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event: 'waitlist_success', data: { service_id: state.service.id } } }));
+    } catch (error) {
+      status.textContent = error.message; status.className = 'form-status error';
+      document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event: 'waitlist_error', data: { service_id: state.service?.id || '' } } }));
+      window.turnstile?.reset(form.dataset.turnstileWidget);
+    } finally { submit.disabled = false; }
+  });
 })();

@@ -8,7 +8,7 @@ document.querySelectorAll('[data-api-form]').forEach(form => form.addEventListen
   submit.disabled = true;
   try {
     const data = Object.fromEntries(new FormData(form));
-    data.turnstileToken = window.turnstile?.getResponse() || '';
+    data.turnstileToken = window.turnstile?.getResponse(form.dataset.turnstileWidget) || '';
     const response = await fetch('/api/forms', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -17,7 +17,7 @@ document.querySelectorAll('[data-api-form]').forEach(form => form.addEventListen
     const output = await response.json();
     if (!response.ok) throw new Error(output.error || 'No se pudo enviar');
     form.reset();
-    window.turnstile?.reset();
+    window.turnstile?.reset(form.dataset.turnstileWidget);
     status.textContent = 'Gracias. Recibimos tu información con el folio ' + output.folio + '.';
     status.className = 'form-status success';
     document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event: 'form_success', data: { form_id: formId } } }));
