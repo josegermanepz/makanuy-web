@@ -17,28 +17,23 @@
   const show = name => {
     stages.forEach(stage => { stage.hidden = stage.dataset.quizStage !== name; });
     const step = name === 'goal' ? 1 : 2;
-    progress.style.width = `${step * 50}%`;
-    status.textContent = name === 'result' ? 'Tu resultado' : `Pregunta ${step} de 2`;
+    progress.style.width = name === 'goal' ? '50%' : '100%';
+    status.textContent = name === 'result' ? 'Tu resultado' : 'Elige tu objetivo';
     root.querySelector(`[data-quiz-stage="${name}"] h2`)?.focus({ preventScroll: true });
   };
   root.querySelectorAll('[data-goal]').forEach(button => button.addEventListener('click', () => {
     goal = button.dataset.goal;
     root.querySelectorAll('[data-goal]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
     document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event: 'quiz_answer', data: { label: goal } } }));
-    show('mode');
-  }));
-  root.querySelectorAll('[data-mode]').forEach(button => button.addEventListener('click', () => {
-    const mode = button.dataset.mode;
-    const result = mode === 'online' && goal !== 'tanita' ? recommendations.online : recommendations[goal];
+    const result = recommendations[goal];
     root.querySelector('#quiz-result-title').textContent = result.title;
-    root.querySelector('#quiz-result-copy').textContent = result.copy + (mode === 'online' && !['bienestar', 'tanita'].includes(goal) ? ' Comenta tu objetivo especializado al solicitarla.' : '');
+    root.querySelector('#quiz-result-copy').textContent = result.copy;
     root.querySelector('#quiz-result-detail').href = result.detail;
     root.querySelector('#quiz-result-book').href = `/agendar.html?servicio=${encodeURIComponent(result.service)}`;
     root.querySelector('#quiz-result-image').src = result.image;
     root.querySelector('#quiz-result-image').alt = result.title;
-    document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event: 'quiz_complete', data: { service_id: result.service, label: mode } } }));
+    document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event: 'quiz_complete', data: { service_id: result.service, label: goal } } }));
     show('result');
   }));
-  root.querySelector('[data-quiz-back]')?.addEventListener('click', () => show('goal'));
   root.querySelector('[data-quiz-reset]')?.addEventListener('click', () => { goal = ''; root.querySelectorAll('.quiz-option').forEach(item => item.removeAttribute('aria-pressed')); show('goal'); });
 })();
