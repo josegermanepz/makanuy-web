@@ -1,5 +1,8 @@
+import {googleAutomation} from './_shared.js';
+
 export const HOURS={1:[15,21],2:[15,21],3:[15,21],4:[15,21],5:[9,14]};
 export const TIME_ZONE='America/Mexico_City';
+export const CALENDAR_ID='yunuen.preg@gmail.com';
 
 const localParts=date=>new Intl.DateTimeFormat('en-CA',{
   timeZone:TIME_ZONE,year:'numeric',month:'2-digit',day:'2-digit',
@@ -19,33 +22,21 @@ export function validSlot(service,date,time){
   const range=HOURS[start.getDay()];
   if(!range)return false;
   const [hour,minute]=time.split(':').map(Number),minutes=hour*60+minute;
-  return minutes>=range[0]*60&&minutes+service.minutes<=range[1]*60&&(minutes-range[0]*60)%(service.minutes+10)===0;
+  return minutes>=range[0]*60&&minutes+service.minutes<=range[1]*60&&(minutes-range[0]*60)%service.minutes===0;
 }
 
-function parseCalendarTime(line,targetDate){
-  const value=line.slice(line.indexOf(':')+1).trim();
-  const match=value.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/);
-  if(!match)return null;
-  if(value.endsWith('Z')){
-    const parsed=new Date(value.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/,'$1-$2-$3T$4:$5:$6Z'));
-    const local=localMinutes(parsed);
-    return local.date===targetDate?local.minutes:null;
-  }
-  return `${match[1]}-${match[2]}-${match[3]}`===targetDate?Number(match[4])*60+Number(match[5]):null;
-}
-
-async function googleBusy(url,targetDate){
-  if(!url)return [];
-  try{
-    const response=await fetch(url,{headers:{accept:'text/calendar'}});
-    if(!response.ok)throw new Error('calendar unavailable');
-    const text=(await response.text()).replace(/\r?\n[ \t]/g,'');
-    return text.split('BEGIN:VEVENT').slice(1).flatMap(block=>{
-      const lines=block.split(/\r?\n/),start=lines.find(line=>line.startsWith('DTSTART')),end=lines.find(line=>line.startsWith('DTEND'));
-      const from=start&&parseCalendarTime(start,targetDate),to=end&&parseCalendarTime(end,targetDate);
-      return Number.isFinite(from)&&Number.isFinite(to)?[[from,to]]:[];
-    });
-  }catch{return []}
+async function googleBusy(env,targetDate){
+  if(!env.GOOGLE_AUTOMATION_URL||!env.GOOGLE_AUTOMATION_SECRET)throw new Error('calendar unavailable');
+  const result=await googleAutomation(env,{action:'availability',date:targetDate,calendarId:CALENDAR_ID});
+  if(!result.ok||result.calendarId!==CALENDAR_ID||!Array.isArray(result.events))throw new Error('calendar unavailable');
+  return result.events.flatMap(event=>{
+    const startDate=new Date(event.start),endDate=new Date(event.end);
+    if(!Number.isFinite(startDate.getTime())||!Number.isFinite(endDate.getTime())||endDate<=startDate)return [];
+    const start=localMinutes(startDate),end=localMinutes(endDate);
+    if(start.date>targetDate||end.date<targetDate||(end.date===targetDate&&end.minutes===0))return [];
+    const from=start.date<targetDate?0:start.minutes,to=end.date>targetDate?24*60:end.minutes;
+    return from<to?[[from,to]]:[];
+  });
 }
 
 export async function busyIntervals(env,date,excludeId=''){
@@ -60,14 +51,14 @@ export async function busyIntervals(env,date,excludeId=''){
       return start.date===date&&end.date===date?[[start.minutes,end.minutes]]:[];
     });
   }
-  return [...internal,...await googleBusy(env.GOOGLE_CALENDAR_ICS_URL,date)];
+  return [...internal,...await googleBusy(env,date)];
 }
 
 export async function availableSlots(env,service,date,excludeId=''){
   const day=new Date(`${date}T12:00:00-06:00`).getDay(),range=HOURS[day];
   if(!range)return [];
   const busy=await busyIntervals(env,date,excludeId),slots=[];
-  for(let minutes=range[0]*60;minutes+service.minutes<=range[1]*60;minutes+=service.minutes+10){
+  for(let minutes=range[0]*60;minutes+service.minutes<=range[1]*60;minutes+=service.minutes){
     const end=minutes+service.minutes;
     if(!busy.some(([from,to])=>minutes<to&&end>from))slots.push(`${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`);
   }

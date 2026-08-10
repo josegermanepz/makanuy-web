@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "check": "wrangler deploy --dry-run"
+    "check": "node tools/validate_v6.mjs && wrangler deploy --dry-run",
+    "validate": "node tools/validate_v6.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.112.0"
