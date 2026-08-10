@@ -1,4 +1,4 @@
-import {SERVICES,json,readJson,clean,folio,sendEmail,escapeHtml,googleAutomation,rateLimit,verifyTurnstile,CONSULTATION_POLICIES_HTML} from '../_shared.js';
+import {SERVICES,json,readJson,clean,folio,googleAutomation,rateLimit,verifyTurnstile} from '../_shared.js';
 import {localDateTime,slotAvailable} from '../_schedule.js';
 
 export const onRequestPost=async({request,env})=>{
@@ -11,7 +11,9 @@ export const onRequestPost=async({request,env})=>{
   for(const key of ['date','time','name','email','phone'])if(!clean(body?.[key]))return json({error:'Completa nombre, correo y teléfono.'},400);
   if(!body.privacy)return json({error:'Acepta el aviso de privacidad y la política de cancelación.'},400);
   if(!/^\S+@\S+\.\S+$/.test(clean(body.email,180)))return json({error:'Escribe un correo válido.'},400);
-  if(!await slotAvailable(env,service,body.date,body.time))return json({error:'Ese horario ya no está disponible. Elige otro.'},409);
+  try{
+    if(!await slotAvailable(env,service,body.date,body.time))return json({error:'Ese horario ya no está disponible. Elige otro.'},409);
+  }catch{return json({error:'No pudimos verificar el calendario de Yunuen. No se creó ninguna cita; intenta nuevamente en unos minutos.'},503)}
 
   const id=crypto.randomUUID(),code=folio('CITA'),start=localDateTime(body.date,body.time),end=new Date(start.getTime()+service.minutes*60000);
   const startIso=start.toISOString(),endIso=end.toISOString();
@@ -21,12 +23,13 @@ export const onRequestPost=async({request,env})=>{
     if(!result.meta?.changes)return json({error:'Ese horario acaba de ocuparse. Elige otro.'},409);
   }catch{return json({error:'No fue posible guardar la cita. Intenta nuevamente.'},500)}
 
-  const safeName=escapeHtml(patient),safeService=escapeHtml(service.name),safeDate=escapeHtml(body.date),safeTime=escapeHtml(body.time),safeEmail=escapeHtml(email),safePhone=escapeHtml(phone);
   const calendar=await googleAutomation(env,{action:'create',title:`Makanuy · ${service.name}`,start:startIso,end:endIso,description:`Solicitud ${code}\nPaciente: ${patient}\nTeléfono: ${phone}\nCorreo: ${email}`,location:service.location==='online'?'Consulta online':'Av. Homero 1339, Piso 5, Polanco II Secc, CDMX',guest:email,folio:code,patient,service:service.name,date:body.date,time:body.time,admin:env.BOOKING_EMAIL||'yunuen.preg@gmail.com'});
-  if(calendar.ok&&calendar.eventId)await env.DB.prepare('UPDATE appointments SET calendar_event_id=? WHERE id=?').bind(calendar.eventId,id).run();
-  const notifications=calendar.ok?[]:await Promise.all([
-    sendEmail(env,{to:env.BOOKING_EMAIL||'yunuen.preg@gmail.com',subject:`Nueva solicitud de cita · ${code}`,html:`<h1>Nueva solicitud de cita</h1><p><strong>${safeService}</strong></p><p>${safeDate} · ${safeTime}</p><p>${safeName}<br>${safeEmail}<br>${safePhone}</p><p>Folio: ${code}</p>`}),
-    sendEmail(env,{to:email,subject:`Recibimos tu solicitud · ${code}`,html:`<h1>Recibimos tu solicitud</h1><p>${safeService}</p><p>${safeDate} · ${safeTime}</p><p>Folio: ${code}</p><p>Tu cita quedará confirmada cuando Makanuy te envíe la confirmación.</p>${CONSULTATION_POLICIES_HTML}`})
-  ]);
-  return json({id,folio:code,email,notificationSent:Boolean(calendar.ok)||notifications.every(item=>item.ok),calendarConnected:Boolean(calendar.ok)});
+  if(!calendar.ok){
+    await env.DB.prepare('DELETE FROM appointments WHERE id=?').bind(id).run();
+    return calendar.error==='slot-unavailable'
+      ?json({error:'Ese horario acaba de ocuparse en el calendario de Yunuen. Elige otro.'},409)
+      :json({error:'No pudimos crear la cita en el calendario de Yunuen. No se guardó la solicitud; intenta nuevamente.'},503);
+  }
+  await env.DB.prepare('UPDATE appointments SET calendar_event_id=?,status=\'confirmed\' WHERE id=?').bind(calendar.eventId||'',id).run();
+  return json({id,folio:code,email,notificationSent:true,calendarConnected:true});
 };
