@@ -36,6 +36,11 @@ if(!schedule.includes("CALENDAR_ID='yunuen.preg@gmail.com'"))errors.push('agenda
 if(/GOOGLE_CALENDAR_ICS_URL/.test(schedule))errors.push('agenda: todavía depende del calendario público ICS');
 if(/service\.minutes\s*\+\s*10/.test(schedule))errors.push('agenda: todavía agrega un margen automático de 10 minutos');
 if(!schedule.includes("action:'availability'"))errors.push('agenda: no consulta disponibilidad mediante la automatización privada');
+const bookingPage=fs.readFileSync(path.join(root,'agendar.html'),'utf8');
+for(const field of ['name','email','phone'])if(!new RegExp(`<input[^>]*required[^>]*name="${field}"|<input[^>]*name="${field}"[^>]*required`).test(bookingPage))errors.push(`agenda: el campo ${field} no es obligatorio`);
+const bookingApi=fs.readFileSync(path.join(root,'functions/api/bookings.js'),'utf8');
+if(!bookingApi.includes("patient.split(/\\s+/).filter(Boolean).length<2"))errors.push('agenda: el servidor no exige nombre completo');
+if(!bookingApi.includes("phoneDigits.length<10||phoneDigits.length>15"))errors.push('agenda: el servidor no valida el teléfono');
 
 if(errors.length){console.error(errors.join('\n'));process.exit(1)}
 console.log(`Validación aprobada: ${files.length} páginas, sin dependencias de Wix ni referencias de pago, sin ids duplicados, recursos locales faltantes o variaciones del menú; calendario exclusivo de Yunuen y sin margen automático.`);
