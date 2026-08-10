@@ -94,6 +94,7 @@
       await loadSlots(date.value);
     } catch (error) {
       slots.innerHTML = `<span class="error">${error.message}</span>`;
+      waitlist.hidden = true;
     }
   });
 
@@ -118,6 +119,8 @@
       showWaitlist();
     } catch (error) {
       message(error.message, true);
+      slots.innerHTML = `<span class="error">${error.message}</span>`;
+      waitlist.hidden = true;
     } finally {
       findNext.disabled = false;
       findNext.textContent = 'Buscar el próximo horario';
