@@ -9,15 +9,18 @@ export const onRequestPost=async({request,env})=>{
   if(clean(body?.companyWebsite))return json({error:'No fue posible procesar la solicitud.'},400);
   if(!await verifyTurnstile(env,request,body?.turnstileToken))return json({error:'No pudimos validar la verificación de seguridad.'},400);
   for(const key of ['date','time','name','email','phone'])if(!clean(body?.[key]))return json({error:'Completa nombre, correo y teléfono.'},400);
+  const patient=clean(body.name,120),email=clean(body.email,180),phone=clean(body.phone,40);
+  if(patient.split(/\s+/).filter(Boolean).length<2)return json({error:'Escribe tu nombre completo y al menos un apellido.'},400);
   if(!body.privacy)return json({error:'Acepta el aviso de privacidad y la política de cancelación.'},400);
-  if(!/^\S+@\S+\.\S+$/.test(clean(body.email,180)))return json({error:'Escribe un correo válido.'},400);
+  if(!/^\S+@\S+\.\S+$/.test(email))return json({error:'Escribe un correo válido.'},400);
+  const phoneDigits=phone.replace(/\D/g,'');
+  if(phoneDigits.length<10||phoneDigits.length>15)return json({error:'Escribe un teléfono válido de 10 a 15 dígitos.'},400);
   try{
     if(!await slotAvailable(env,service,body.date,body.time))return json({error:'Ese horario ya no está disponible. Elige otro.'},409);
   }catch{return json({error:'No pudimos verificar el calendario de Yunuen. No se creó ninguna cita; intenta nuevamente en unos minutos.'},503)}
 
   const id=crypto.randomUUID(),code=folio('CITA'),start=localDateTime(body.date,body.time),end=new Date(start.getTime()+service.minutes*60000);
   const startIso=start.toISOString(),endIso=end.toISOString();
-  const patient=clean(body.name,120),email=clean(body.email,180),phone=clean(body.phone,40);
   try{
     const result=await env.DB.prepare("INSERT INTO appointments(id,folio,service_id,service_name,date,start_at,end_at,name,email,phone,status,created_at) SELECT ?,?,?,?,?,?,?,?,?,?,'pending_confirmation',datetime('now') WHERE NOT EXISTS (SELECT 1 FROM appointments WHERE status IN ('pending_confirmation','pending','confirmed') AND start_at < ? AND end_at > ?)").bind(id,code,service.id,service.name,body.date,startIso,endIso,patient,email,phone,endIso,startIso).run();
     if(!result.meta?.changes)return json({error:'Ese horario acaba de ocuparse. Elige otro.'},409);
