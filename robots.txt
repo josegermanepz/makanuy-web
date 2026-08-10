@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /panel-contenido/
+Disallow: /panel-resultados/
 Sitemap: https://www.makanuyconsultas.com/sitemap.xml

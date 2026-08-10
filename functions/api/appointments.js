@@ -41,7 +41,7 @@ export const onRequestPost=async({request,env})=>{
         :json({error:'No pudimos actualizar el calendario de Yunuen. Se conservó el horario anterior.'},503);
     }
     await env.DB.prepare("UPDATE appointments SET status='confirmed',updated_at=datetime('now') WHERE id=?").bind(row.id).run();
-    return json({ok:true,message:'Solicitamos el cambio. Recibirás la confirmación por correo.'});
+    return json({ok:true,message:'Tu cita fue reprogramada. Recibirás la confirmación actualizada por correo.'});
   }
   return json({error:'Acción inválida.'},400);
 };

@@ -8,6 +8,8 @@
 /recursos/ /recursos.html 200
 /recomendaciones/ /recomendaciones.html 200
 /recetas/ /recetas.html 200
+/recetarios /recetas/ 301
+/recetarios/ /recetas/ 301
 /preguntas-frecuentes/ /preguntas-frecuentes.html 200
 /contacto/ /contacto.html 200
 /agendar/ /agendar.html 200
@@ -15,6 +17,10 @@
 /privacidad/ /privacidad.html 200
 /terminos/ /terminos.html 200
 /cookies/ /cookies.html 200
+/referidos/ /referidos.html 200
+/receta/ /receta.html 200
+/panel-contenido/ /panel-contenido.html 200
+/panel-resultados/ /panel-resultados.html 200
 /servicios/consulta-presencial/ /servicios.html 301
 /servicios/consulta-para-adulto-mayor/ /servicios.html 301
 /servicios/consulta-familiar/ /servicios.html 301
@@ -27,6 +33,33 @@
 /servicios/tanita-bioempedancia/ /servicios-tanita-bioempedancia.html 200
 /recetas/rollitos-del-mar/ /recetas-rollitos-del-mar-frescura-en-cada-bocado.html 200
 /recetas/tostadas-crunch-de-atun-tropical/ /recetas-tostadas-crunch-de-atun-tropical.html 200
+
+# Canonicaliza las direcciones públicas y evita duplicados con extensión .html.
+/servicios.html /servicios/ 301
+/nutricion-mujer.html /nutricion-mujer/ 301
+/sobre-yunuen.html /yunuen-figueroa/ 301
+/empresas.html /empresas/ 301
+/recursos.html /recursos/ 301
+/recomendaciones.html /recomendaciones/ 301
+/recetas.html /recetas/ 301
+/consulta-ideal.html /consulta-ideal/ 301
+/preguntas-frecuentes.html /preguntas-frecuentes/ 301
+/contacto.html /contacto/ 301
+/agendar.html /agendar/ 301
+/gestionar-cita.html /gestionar-cita/ 301
+/privacidad.html /privacidad/ 301
+/terminos.html /terminos/ 301
+/cookies.html /cookies/ 301
+/referidos.html /referidos/ 301
+/servicios-consulta-bienestar-composicion-corporal.html /servicios/consulta-bienestar-composicion-corporal/ 301
+/servicios-consulta-de-nutricion-hormonal.html /servicios/consulta-de-nutricion-hormonal/ 301
+/servicios-consulta-de-embarazo.html /servicios/consulta-de-embarazo/ 301
+/servicios-consulta-para-el-climaterio-y-menopausia.html /servicios/consulta-para-el-climaterio-y-menopausia/ 301
+/servicios-consulta-online-1.html /servicios/consulta-online/ 301
+/servicios-consulta-de-nutricion-y-sistema-inmune.html /servicios/consulta-de-nutricion-y-sistema-inmune/ 301
+/servicios-tanita-bioempedancia.html /servicios/tanita-bioempedancia/ 301
+/recetas-rollitos-del-mar-frescura-en-cada-bocado.html /recetas/rollitos-del-mar/ 301
+/recetas-tostadas-crunch-de-atun-tropical.html /recetas/tostadas-crunch-de-atun-tropical/ 301
 
 /servicios/asesoria-de-lactancia/ /servicios.html 301
 /servicios-consulta-presencial.html /servicios.html 301

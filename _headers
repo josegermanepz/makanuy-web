@@ -14,6 +14,17 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+/api/*
+  Cache-Control: no-store
+
+/panel-contenido*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+
+/panel-resultados*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+
 /*.jpg
   Cache-Control: public, max-age=2592000
 

@@ -1,1 +1,64 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Publicar recetario | Makanuy</title><link rel="stylesheet" href="/enhanced.css"><link rel="stylesheet" href="/v5.css?v=20260804a"><link rel="stylesheet" href="/v6.css?v=20260806a"></head><body><main id="contenido"><section class="section"><div class="container content-narrow"><p class="eyebrow">Uso interno</p><h1>Publicar un recetario</h1><p>La clave se utiliza solo para esta publicación y no se guarda en el navegador.</p><form id="recipe-admin" class="form-shell"><label>Clave de publicación<input required type="password" name="token" autocomplete="current-password"></label><label>Título<input required name="title" maxlength="160"></label><label>Resumen<textarea required name="summary" maxlength="500" rows="3"></textarea></label><label>Ingredientes — uno por línea<textarea required name="ingredients" rows="8"></textarea></label><label>Preparación — un paso por línea<textarea required name="steps" rows="8"></textarea></label><label>Etiquetas separadas por coma<input name="tags" placeholder="rápida, desayuno, vegetariana"></label><label>Ruta de imagen local (opcional)<input name="imageUrl" placeholder="/hero-collage.avif"></label><button class="button dark" type="submit">Publicar receta</button><p class="form-status" role="status" aria-live="polite"></p></form><div id="recipe-admin-success" class="analytics-note" hidden></div><p><a href="/recetas.html">Ver recetarios</a> · <a href="/">Volver al sitio</a></p></div></section></main><script src="/panel-contenido.js" defer></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Administrar recetarios | Makanuy</title>
+  <link rel="stylesheet" href="/enhanced.css">
+  <link rel="stylesheet" href="/v5.css?v=20260804a">
+  <link rel="stylesheet" href="/v6.css?v=20260809b">
+</head>
+<body><a class="skip" href="#contenido">Ir al contenido</a>
+  <main id="contenido">
+    <section class="section">
+      <div class="container admin-shell">
+        <p class="eyebrow">Uso interno</p>
+        <h1>Administrar recetarios</h1>
+        <p class="lead">Publica, corrige o retira recetas sin modificar el código del sitio. La clave se utiliza únicamente durante esta sesión y no se guarda en el navegador.</p>
+
+        <section class="form-shell admin-login" aria-labelledby="access-title">
+          <h2 id="access-title">Acceso</h2>
+          <label>Clave de publicación<input id="recipe-token" type="password" autocomplete="current-password" required></label>
+          <button class="button" id="load-recipes" type="button">Cargar recetarios publicados</button>
+          <p id="recipe-admin-status" class="form-status" role="status" aria-live="polite"></p>
+        </section>
+
+        <div class="admin-grid admin-editor-grid">
+          <form id="recipe-admin" class="form-shell">
+            <input type="hidden" name="currentSlug">
+            <h2 id="recipe-form-title">Publicar un recetario</h2>
+            <label>Título<input required name="title" maxlength="160"></label>
+            <label>Dirección corta (opcional)<input name="slug" maxlength="80" placeholder="ensalada-de-temporada"><small>Déjala vacía para generarla a partir del título.</small></label>
+            <label>Resumen<textarea required name="summary" maxlength="500" rows="3"></textarea></label>
+            <label>Ingredientes — uno por línea<textarea required name="ingredients" rows="8"></textarea></label>
+            <label>Preparación — un paso por línea<textarea required name="steps" rows="8"></textarea></label>
+            <label>Etiquetas separadas por coma<input name="tags" placeholder="rápida, desayuno, vegetariana"></label>
+            <label>Ruta de imagen local<input name="imageUrl" value="/hero-collage.avif" placeholder="/receta-nueva.webp"><small>Usa una imagen que ya se encuentre en el sitio. La ruta debe comenzar con /.</small></label>
+            <div class="actions">
+              <button class="button dark" type="submit">Publicar receta</button>
+              <button class="button" id="cancel-recipe-edit" type="button" hidden>Cancelar edición</button>
+            </div>
+          </form>
+
+          <aside class="admin-preview" aria-live="polite">
+            <p class="eyebrow">Vista previa</p>
+            <img id="recipe-preview-image" src="/hero-collage.avif" alt="Vista previa del recetario">
+            <div class="recipe-tags" id="recipe-preview-tags"></div>
+            <h2 id="recipe-preview-title">Título del recetario</h2>
+            <p id="recipe-preview-summary">Aquí aparecerá el resumen antes de publicar.</p>
+          </aside>
+        </div>
+
+        <section id="recipe-admin-success" class="analytics-note" hidden></section>
+        <section aria-labelledby="published-title">
+          <h2 id="published-title">Recetarios guardados</h2>
+          <div id="recipe-admin-list" class="admin-list"><p>Escribe la clave y selecciona “Cargar recetarios publicados”.</p></div>
+        </section>
+        <p><a href="/recetas/">Ver recetarios</a> · <a href="/panel-resultados/">Ver resultados del sitio</a> · <a href="/">Volver al sitio</a></p>
+      </div>
+    </section>
+  </main>
+  <script src="/panel-contenido.js" defer></script>
+</body>
+</html>

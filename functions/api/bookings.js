@@ -32,7 +32,7 @@ export const onRequestPost=async({request,env})=>{
     await env.DB.prepare('DELETE FROM appointments WHERE id=?').bind(id).run();
     return calendar.error==='slot-unavailable'
       ?json({error:'Ese horario acaba de ocuparse en el calendario de Yunuen. Elige otro.'},409)
-      :json({error:'No pudimos crear la cita en el calendario de Yunuen. No se guardó la solicitud; intenta nuevamente.'},503);
+      :json({error:'No pudimos crear la cita en el calendario de Yunuen. No se realizó la reservación; intenta nuevamente.'},503);
   }
   await env.DB.prepare('UPDATE appointments SET calendar_event_id=?,status=\'confirmed\' WHERE id=?').bind(calendar.eventId||'',id).run();
   return json({id,folio:code,email,modality,meetLink:isOnline?(calendar.meetLink||''):null,notificationSent:true,calendarConnected:true});

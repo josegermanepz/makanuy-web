@@ -5,7 +5,8 @@ const EVENTS = new Set([
   'form_start', 'form_success', 'form_error', 'booking_service', 'booking_date',
   'booking_slot', 'booking_success', 'booking_error', 'calculator_water',
   'calculator_equivalents', 'recommendation_filter', 'quiz_answer', 'quiz_complete',
-  'waitlist_success', 'waitlist_error', 'recipe_filter'
+  'waitlist_success', 'waitlist_error', 'recipe_filter', 'appointment_lookup',
+  'appointment_rescheduled', 'appointment_cancelled'
 ]);
 
 export const onRequestPost = async ({ request, env }) => {

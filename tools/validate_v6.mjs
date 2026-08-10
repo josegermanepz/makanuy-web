@@ -18,6 +18,11 @@ for(const file of files){
   }
   if(/static\.wixstatic\.com|wix\.com/i.test(source))errors.push(`${file}: conserva una dependencia de Wix`);
   if(/mercadopago|mercado pago/i.test(source))errors.push(`${file}: muestra una referencia de pago`);
+  if(/href="\/[^"]+\.html(?:[?#][^"]*)?"/i.test(source))errors.push(`${file}: conserva enlaces internos con extensión .html`);
+  if(/Makanuy confirmará el horario después de recibir tu solicitud|genera una solicitud con folio|horario queda confirmado cuando/i.test(source))errors.push(`${file}: conserva textos de la agenda anterior`);
+  if(!source.includes('class="skip"'))errors.push(`${file}: no incluye enlace para saltar al contenido`);
+  const description=source.match(/<meta name="description" content="([^"]*)"/i)?.[1];
+  if(description&&description.length>165)errors.push(`${file}: la descripción SEO supera 165 caracteres`);
   const nav=source.match(/<nav id="menu"[\s\S]*?<\/nav>/i)?.[0];
   if(nav)navs.set(file,nav);
   for(const match of source.matchAll(/(?:src|href)="(\/[^"]+)"/g)){
@@ -45,6 +50,10 @@ if(!bookingApi.includes("patient.split(/\\s+/).filter(Boolean).length<2"))errors
 if(!bookingApi.includes("phoneDigits.length<10||phoneDigits.length>15"))errors.push('agenda: el servidor no valida el teléfono');
 if(!bookingApi.includes("const isOnline=service.location==='online'"))errors.push('agenda: el servidor no deriva la modalidad del servicio');
 if(!bookingApi.includes("meetLink:isOnline?"))errors.push('agenda: la respuesta no limita Google Meet a la consulta online');
+const redirects=fs.readFileSync(path.join(root,'_redirects'),'utf8');
+for(const route of ['/recetarios /recetas/ 301','/receta/ /receta.html 200','/panel-contenido/ /panel-contenido.html 200','/panel-resultados/ /panel-resultados.html 200'])if(!redirects.includes(route))errors.push(`rutas: falta ${route}`);
+const recipeApi=fs.readFileSync(path.join(root,'functions/api/recipes.js'),'utf8');
+if(!recipeApi.includes('onRequestPut')||!recipeApi.includes('onRequestDelete'))errors.push('recetarios: el panel no permite editar y retirar publicaciones');
 
 if(errors.length){console.error(errors.join('\n'));process.exit(1)}
 console.log(`Validación aprobada: ${files.length} páginas, sin dependencias de Wix ni referencias de pago, sin ids duplicados, recursos locales faltantes o variaciones del menú; calendario exclusivo de Yunuen, modalidad derivada del servicio y sin margen automático.`);

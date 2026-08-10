@@ -17,7 +17,7 @@ export const onRequestGet=async({request,env})=>{
     env.DB.prepare("SELECT event,COUNT(*) count FROM site_events WHERE created_at>=datetime('now',?) GROUP BY event ORDER BY count DESC").bind(period).all(),
     env.DB.prepare("SELECT path,COUNT(*) views FROM site_events WHERE event='page_view' AND created_at>=datetime('now',?) GROUP BY path ORDER BY views DESC LIMIT 12").bind(period).all(),
     env.DB.prepare("SELECT json_extract(details,'$.service_id') service,COUNT(*) count FROM site_events WHERE event IN ('booking_service','booking_success','quiz_complete') AND created_at>=datetime('now',?) AND json_extract(details,'$.service_id') IS NOT NULL GROUP BY service ORDER BY count DESC").bind(period).all(),
-    env.DB.prepare("SELECT date(created_at) day,SUM(event='page_view') views,SUM(event='click_agenda') agenda_clicks,SUM(event='booking_success') bookings FROM site_events WHERE created_at>=datetime('now',?) GROUP BY day ORDER BY day").bind(period).all()
+    env.DB.prepare("SELECT date(created_at) day,SUM(event='page_view') views,SUM(event='click_agenda') agenda_clicks,SUM(event='booking_success') bookings,SUM(event='form_success') forms,SUM(event IN ('form_error','booking_error','waitlist_error')) errors FROM site_events WHERE created_at>=datetime('now',?) GROUP BY day ORDER BY day").bind(period).all()
   ]);
   return json({days,generatedAt:new Date().toISOString(),totals:totals.results||[],pages:pages.results||[],services:services.results||[],daily:daily.results||[]});
 };

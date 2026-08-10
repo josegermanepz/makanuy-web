@@ -31,7 +31,7 @@
     const grid=document.querySelector('#recipe-grid');
     (data.recipes||[]).forEach(recipe=>{
       const article=document.createElement('article');article.className='recipe-card';article.dataset.tags=(recipe.tags||[]).map(normalize).join(' ');article.dataset.search=normalize([recipe.title,recipe.summary,...(recipe.tags||[])].join(' '));
-      article.innerHTML=`<img src="${safe(recipe.image_url||'/hero-collage.avif')}" alt="${safe(recipe.title)}" loading="lazy" decoding="async"><div class="recipe-tags">${(recipe.tags||[]).map(tag=>`<span>${safe(tag)}</span>`).join('')}</div><h2>${safe(recipe.title)}</h2><p>${safe(recipe.summary)}</p><a class="button" href="/receta.html?slug=${encodeURIComponent(recipe.slug)}">Ver receta</a>`;
+      article.innerHTML=`<img src="${safe(recipe.image_url||'/hero-collage.avif')}" alt="${safe(recipe.title)}" loading="lazy" decoding="async"><div class="recipe-tags">${(recipe.tags||[]).map(tag=>`<span>${safe(tag)}</span>`).join('')}</div><h2>${safe(recipe.title)}</h2><p>${safe(recipe.summary)}</p><a class="button" href="/receta/?slug=${encodeURIComponent(recipe.slug)}">Ver receta</a>`;
       grid.append(article);
     });
     cards=[...document.querySelectorAll('.recipe-card')];apply();

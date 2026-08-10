@@ -55,7 +55,7 @@
   const waitlist = document.createElement('section');
   waitlist.className = 'waitlist-card';
   waitlist.hidden = true;
-  waitlist.innerHTML = `<h3>No encontraste un horario adecuado</h3><p>Déjanos tus datos y te avisaremos si se abre un espacio. Esto no confirma una cita.</p><form id="waitlist-form" data-api-form="waitlist" method="post"><label class="hp-field" aria-hidden="true">Sitio web<input name="companyWebsite" tabindex="-1" autocomplete="off"></label><div class="form-grid"><label>Nombre<input required name="name" autocomplete="name" maxlength="120"></label><label>Correo<input required type="email" name="email" autocomplete="email" maxlength="180"></label><label class="wide">Teléfono (opcional)<input type="tel" name="phone" autocomplete="tel" maxlength="40"></label></div><label><input style="width:auto;min-height:auto" required type="checkbox" name="privacy"> Leí el <a href="/privacidad.html" target="_blank" rel="noopener">aviso de privacidad</a>.</label><button class="button dark" type="submit">Unirme a la lista de espera</button><p class="form-status" role="status" aria-live="polite"></p></form>`;
+  waitlist.innerHTML = `<h3>No encontraste un horario adecuado</h3><p>Déjanos tus datos y te avisaremos si se abre un espacio. Esto no confirma una cita.</p><form id="waitlist-form" data-api-form="waitlist" method="post"><label class="hp-field" aria-hidden="true">Sitio web<input name="companyWebsite" tabindex="-1" autocomplete="off"></label><div class="form-grid"><label>Nombre<input required name="name" autocomplete="name" maxlength="120"></label><label>Correo<input required type="email" name="email" autocomplete="email" maxlength="180"></label><label class="wide">Teléfono (opcional)<input type="tel" name="phone" autocomplete="tel" maxlength="40"></label></div><label><input style="width:auto;min-height:auto" required type="checkbox" name="privacy"> Leí el <a href="/privacidad/" target="_blank" rel="noopener">aviso de privacidad</a>.</label><button class="button dark" type="submit">Unirme a la lista de espera</button><p class="form-status" role="status" aria-live="polite"></p></form>`;
   dateStage?.append(waitlist);
   const showWaitlist = () => { waitlist.hidden = false; waitlist.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
   if (date) {
@@ -95,6 +95,7 @@
     } catch (error) {
       slots.innerHTML = `<span class="error">${error.message}</span>`;
       waitlist.hidden = true;
+      track('booking_error', { service_id: state.service?.id || '', status: 'availability' });
     }
   });
 
@@ -121,6 +122,7 @@
       message(error.message, true);
       slots.innerHTML = `<span class="error">${error.message}</span>`;
       waitlist.hidden = true;
+      track('booking_error', { service_id: state.service?.id || '', status: 'next_slot' });
     } finally {
       findNext.disabled = false;
       findNext.textContent = 'Buscar el próximo horario';
@@ -148,7 +150,7 @@
     const submit = form.querySelector('[type="submit"]');
     submit.disabled = true;
     fields.turnstileToken = window.turnstile?.getResponse(event.currentTarget.dataset.turnstileWidget) || '';
-    message('Guardando tu solicitud…');
+    message('Confirmando tu cita…');
     try {
       const response = await fetch('/api/bookings', {
         method: 'POST',
@@ -156,9 +158,9 @@
         body: JSON.stringify({ ...fields, serviceId: state.service.id, date: state.date, time: state.time })
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'No fue posible guardar la solicitud');
+      if (!response.ok) throw new Error(data.error || 'No fue posible confirmar la cita');
       document.querySelector('#booking-summary').innerHTML = `<strong>${state.service.name}</strong><br>${localDate(state.date)} · ${state.time} h<br>${state.service.location} · $${state.service.price} MXN`;
-      document.querySelector('#booking-success').textContent = `Folio ${data.folio}. ${data.notificationSent ? 'Enviamos los datos y las políticas a tu correo.' : 'Conserva este folio; Makanuy te contactará para confirmar.'}`;
+      document.querySelector('#booking-success').textContent = `Folio ${data.folio}. ${data.notificationSent ? 'Enviamos los datos y las políticas a tu correo.' : 'Tu cita ya está confirmada. Conserva este folio y contacta a Makanuy si no recibes el correo.'}`;
       const instructions = document.querySelector('#booking-instructions');
       if (instructions) instructions.textContent = state.service.id === 'online'
         ? 'La invitación y el correo incluyen el enlace de Google Meet para conectarte.'
