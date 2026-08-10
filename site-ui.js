@@ -14,6 +14,7 @@
     if (!Number.isFinite(kg) || kg <= 0) { output.textContent = 'Ingresa un peso válido.'; return; }
     const ml = Math.round(kg * 35);
     output.innerHTML = '<span>¿Cuántos mililitros debes tomar?</span><br><strong>' + ml.toLocaleString('es-MX') + ' ml al día</strong>';
+    document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event: 'calculator_water' } }));
   });
   const portions = {
     'Proteína': {'Pechuga de pollo cocida':'30 g','Pescado cocido':'40 g','Atún en agua':'30 g','Huevo entero':'1 pieza','Queso panela':'40 g'},
@@ -39,6 +40,7 @@
       event.preventDefault();
       if (!group.value || !food.value || !target.value) { output.textContent = 'Selecciona el grupo, tu alimento y el equivalente.'; return; }
       output.innerHTML = '<strong>1 equivalente</strong><br>' + portions[group.value][food.value] + ' de ' + food.value + ' equivale a ' + portions[group.value][target.value] + ' de ' + target.value + '.';
+      document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event: 'calculator_equivalents' } }));
     });
   }
 })();

@@ -10,7 +10,7 @@ export const onRequestGet = async ({ env }) => {
   } catch {
     database = false;
   }
-  const calendar = Boolean(env.GOOGLE_CALENDAR_ICS_URL && env.GOOGLE_AUTOMATION_URL);
+  const calendar = Boolean(env.GOOGLE_AUTOMATION_URL && env.GOOGLE_AUTOMATION_SECRET);
   const email = Boolean(env.RESEND_API_KEY || env.GOOGLE_AUTOMATION_URL);
   const turnstile = Boolean(env.TURNSTILE_SECRET_KEY && env.TURNSTILE_SITE_KEY);
   const ok = database && calendar;

@@ -30,7 +30,7 @@ footer{background:var(--ink);color:#fff;padding:70px 0 32px}footer a{color:#fff}
 /* Keep calculator photography legible without aggressive cropping. */
 #calculadoras{scroll-margin-top:110px}
 #calculadoras .wix-calculator{border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(54,44,36,.06)}
-#calculadoras .wix-calculator-media{object-fit:contain;object-position:center;background:#f6f1e8;padding:14px;transform:none!important}
+#calculadoras .wix-calculator-media{object-fit:contain;object-position:center;background:var(--cream);padding:14px;transform:none!important}
 
 @media(max-width:980px){.services-page .cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.services-page .cards{grid-template-columns:1fr}.services-page .section{padding-top:42px}.services-page .card>img{aspect-ratio:16/8}}
