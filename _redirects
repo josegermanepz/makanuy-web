@@ -3,8 +3,6 @@
 /refer-friends /referidos.html 301
 /servicios/ /servicios.html 200
 /nutricion-mujer/ /nutricion-mujer.html 200
-/yunuen-figueroa /yunuen-figueroa.html 200
-/yunuen-figueroa/ /yunuen-figueroa.html 200
 /empresas/ /empresas.html 200
 /recursos/ /recursos.html 200
 /recomendaciones/ /recomendaciones.html 200
@@ -38,8 +36,8 @@
 # Canonicaliza las direcciones públicas y evita duplicados con extensión .html.
 /servicios.html /servicios/ 301
 /nutricion-mujer.html /nutricion-mujer/ 301
-/sobre-yunuen /yunuen-figueroa/ 301
-/sobre-yunuen.html /yunuen-figueroa/ 301
+/sobre-yunuen /yunuen-figueroa 301
+/sobre-yunuen.html /yunuen-figueroa 301
 /empresas.html /empresas/ 301
 /recursos.html /recursos/ 301
 /recomendaciones.html /recomendaciones/ 301
