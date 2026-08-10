@@ -31,5 +31,11 @@ for(const file of files){
 const reference=navs.get('index.html');
 for(const [file,nav] of navs)if(nav!==reference)errors.push(`${file}: el menú superior difiere del inicio`);
 
+const schedule=fs.readFileSync(path.join(root,'functions/_schedule.js'),'utf8');
+if(!schedule.includes("CALENDAR_ID='yunuen.preg@gmail.com'"))errors.push('agenda: no fija el calendario exclusivo de Yunuen');
+if(/GOOGLE_CALENDAR_ICS_URL/.test(schedule))errors.push('agenda: todavía depende del calendario público ICS');
+if(/service\.minutes\s*\+\s*10/.test(schedule))errors.push('agenda: todavía agrega un margen automático de 10 minutos');
+if(!schedule.includes("action:'availability'"))errors.push('agenda: no consulta disponibilidad mediante la automatización privada');
+
 if(errors.length){console.error(errors.join('\n'));process.exit(1)}
-console.log(`Validación aprobada: ${files.length} páginas, sin dependencias de Wix, pagos visibles, ids duplicados, recursos locales faltantes ni variaciones del menú.`);
+console.log(`Validación aprobada: ${files.length} páginas, sin dependencias de Wix ni referencias de pago, sin ids duplicados, recursos locales faltantes o variaciones del menú; calendario exclusivo de Yunuen y sin margen automático.`);
