@@ -227,7 +227,7 @@ def main() -> None:
     }
     faq.write_text(inject_schema(source, faq_schema))
 
-    about = ROOT / 'sobre-yunuen.html'
+    about = ROOT / 'yunuen-figueroa.html'
     about_schema = {
         '@context': 'https://schema.org',
         '@type': 'Person',
