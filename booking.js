@@ -12,15 +12,6 @@
     { id: 'online', slug: 'consulta-online-1', name: 'Consulta Online', minutes: 60, price: 800, location: 'Online' }
   ];
   const state = { service: null, date: null, time: null };
-  const modalityLabel = value => value === 'online' ? 'En línea' : 'Presencial';
-  const bookingForm = document.querySelector('#booking-form');
-  const detailsGrid = bookingForm?.querySelector('.form-grid');
-  if (bookingForm && detailsGrid && !bookingForm.elements.modality) {
-    const modality = document.createElement('fieldset');
-    modality.className = 'booking-modality';
-    modality.innerHTML = `<legend>Modalidad de la consulta</legend><p>Selecciona una sola opción.</p><div class="modality-options"><label><input required type="radio" name="modality" value="presencial"> Presencial</label><label><input required type="radio" name="modality" value="online"> En línea</label></div>`;
-    detailsGrid.insertAdjacentElement('afterend', modality);
-  }
   const track = (event, data = {}) => document.dispatchEvent(new CustomEvent('makanuy:track', { detail: { event, data } }));
 
   const show = name => {
@@ -138,7 +129,7 @@
 
   next?.addEventListener('click', () => {
     const chosen = document.querySelector('#chosen-booking');
-    if (chosen) chosen.textContent = `${state.service.name} · ${localDate(state.date)} · ${state.time} h. Selecciona la modalidad abajo.`;
+    if (chosen) chosen.textContent = `${state.service.name} · ${state.service.location} · ${localDate(state.date)} · ${state.time} h.`;
     show('details');
   });
 
@@ -148,7 +139,6 @@
     const form = event.currentTarget;
     if (!form.reportValidity()) return;
     const fields = Object.fromEntries(new FormData(form));
-    if (!['presencial', 'online'].includes(fields.modality)) return message('Selecciona si deseas la consulta presencial o en línea.', true);
     const fullName = String(fields.name || '').trim().split(/\s+/).filter(Boolean);
     const nameInput = form.elements.name, phoneInput = form.elements.phone;
     nameInput.setCustomValidity(fullName.length >= 2 ? '' : 'Escribe tu nombre completo y al menos un apellido.');
@@ -167,8 +157,12 @@
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'No fue posible guardar la solicitud');
-      document.querySelector('#booking-summary').innerHTML = `<strong>${state.service.name}</strong><br>${localDate(state.date)} · ${state.time} h<br>${modalityLabel(fields.modality)} · $${state.service.price} MXN`;
+      document.querySelector('#booking-summary').innerHTML = `<strong>${state.service.name}</strong><br>${localDate(state.date)} · ${state.time} h<br>${state.service.location} · $${state.service.price} MXN`;
       document.querySelector('#booking-success').textContent = `Folio ${data.folio}. ${data.notificationSent ? 'Enviamos los datos y las políticas a tu correo.' : 'Conserva este folio; Makanuy te contactará para confirmar.'}`;
+      const instructions = document.querySelector('#booking-instructions');
+      if (instructions) instructions.textContent = state.service.id === 'online'
+        ? 'La invitación y el correo incluyen el enlace de Google Meet para conectarte.'
+        : 'La invitación y el correo incluyen la dirección del consultorio. Esta cita no genera un enlace de Google Meet.';
       show('complete');
       track('booking_success', { service_id: state.service.id, status: data.calendarConnected ? 'calendar_connected' : 'saved' });
     } catch (error) {
