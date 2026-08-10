@@ -136,9 +136,17 @@
   document.querySelector('#booking-form')?.addEventListener('submit', async event => {
     event.preventDefault();
     if (!state.service || !state.date || !state.time) return message('Selecciona servicio, fecha y horario.', true);
-    const submit = event.currentTarget.querySelector('[type="submit"]');
+    const form = event.currentTarget;
+    if (!form.reportValidity()) return;
+    const fields = Object.fromEntries(new FormData(form));
+    const fullName = String(fields.name || '').trim().split(/\s+/).filter(Boolean);
+    const nameInput = form.elements.name, phoneInput = form.elements.phone;
+    nameInput.setCustomValidity(fullName.length >= 2 ? '' : 'Escribe tu nombre completo y al menos un apellido.');
+    const phoneDigits = String(fields.phone || '').replace(/\D/g, '');
+    phoneInput.setCustomValidity(phoneDigits.length >= 10 && phoneDigits.length <= 15 ? '' : 'Escribe un teléfono válido de 10 a 15 dígitos.');
+    if (!form.reportValidity()) return;
+    const submit = form.querySelector('[type="submit"]');
     submit.disabled = true;
-    const fields = Object.fromEntries(new FormData(event.currentTarget));
     fields.turnstileToken = window.turnstile?.getResponse(event.currentTarget.dataset.turnstileWidget) || '';
     message('Guardando tu solicitud…');
     try {
@@ -160,6 +168,9 @@
       submit.disabled = false;
     }
   });
+
+  document.querySelector('#booking-form [name="name"]')?.addEventListener('input', event => event.currentTarget.setCustomValidity(''));
+  document.querySelector('#booking-form [name="phone"]')?.addEventListener('input', event => event.currentTarget.setCustomValidity(''));
 
   const requested = decodeURIComponent(new URLSearchParams(location.search).get('servicio') || '');
   if (requested) {
