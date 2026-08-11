@@ -16,6 +16,7 @@ test('recovery route uses the Makanuy secure flow',async()=>{
   assert.match(html,/noindex,nofollow,noarchive/);
   assert.match(html,/href="exp:\/\/192\.168\.1\.88:8081\/--\/login"/);
   assert.match(html,/Volver a iniciar sesión en Expo Go/);
+  assert.match(html,/href="\/password-reset\.css\?v=2"/);
   assert.match(script,/window\.location\.hash/);
   assert.match(script,/window\.history\.replaceState/);
   assert.match(script,/type !== 'recovery'/);
