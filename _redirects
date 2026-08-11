@@ -20,6 +20,7 @@
 /receta/ /receta.html 200
 /panel-contenido/ /panel-contenido.html 200
 /panel-resultados/ /panel-resultados.html 200
+/restablecer-contrasena/ /restablecer-contrasena.html 200
 /servicios/consulta-presencial/ /servicios.html 301
 /servicios/consulta-para-adulto-mayor/ /servicios.html 301
 /servicios/consulta-familiar/ /servicios.html 301
@@ -50,6 +51,7 @@
 /privacidad.html /privacidad/ 301
 /terminos.html /terminos/ 301
 /cookies.html /cookies/ 301
+/restablecer-contrasena.html /restablecer-contrasena/ 301
 /referidos.html /referidos/ 301
 /servicios-consulta-bienestar-composicion-corporal.html /servicios/consulta-bienestar-composicion-corporal/ 301
 /servicios-consulta-de-nutricion-hormonal.html /servicios/consulta-de-nutricion-hormonal/ 301
