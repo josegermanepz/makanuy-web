@@ -14,6 +14,8 @@ test('recovery route uses the Makanuy secure flow',async()=>{
   ]);
   assert.match(html,/Crea una nueva contraseña/);
   assert.match(html,/noindex,nofollow,noarchive/);
+  assert.match(html,/href="exp:\/\/192\.168\.1\.88:8081\/--\/login"/);
+  assert.match(html,/Volver a iniciar sesión en Expo Go/);
   assert.match(script,/window\.location\.hash/);
   assert.match(script,/window\.history\.replaceState/);
   assert.match(script,/type !== 'recovery'/);
@@ -28,7 +30,9 @@ test('recovery route uses the Makanuy secure flow',async()=>{
 
 test('recovery route receives strict response headers',async()=>{
   const headers=await read('_headers');
+  const globalBlock=headers.split('/*')[1].split('\n\n')[0];
   const block=headers.split('/restablecer-contrasena*')[1].split('\n\n')[0];
+  assert.match(globalBlock,/connect-src[^\n]*https:\/\/bxjuhvshpmaivbavdwqp\.supabase\.co/);
   assert.match(block,/Cache-Control: no-store/);
   assert.match(block,/X-Frame-Options: DENY/);
   assert.match(block,/Referrer-Policy: no-referrer/);
