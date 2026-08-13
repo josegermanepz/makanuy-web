@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <title>Restablecer contraseña | Makanuy</title>
   <link rel="stylesheet" href="/password-reset.css?v=2">
-  <script src="/password-reset.js" defer></script>
+  <script src="/password-reset.js" type="module"></script>
 </head>
 <body>
   <a class="skip" href="#contenido">Saltar al contenido</a>
@@ -29,7 +29,8 @@
       </div>
 
       <p class="privacy-note">Makanuy nunca te pedirá que compartas tu contraseña por correo o mensaje.</p>
-      <a class="home-link" href="exp://192.168.1.88:8081/--/login">Volver a iniciar sesión en Expo Go</a>
+      <a class="home-link" id="return-to-app" hidden>Volver a iniciar sesión en Expo Go</a>
+      <p class="return-help" id="return-help" hidden>Si Expo Go no se abre, abre la aplicación manualmente, selecciona Makanuy y vuelve a la pantalla de inicio de sesión.</p>
     </section>
   </main>
 </body>

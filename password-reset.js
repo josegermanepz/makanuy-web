@@ -1,11 +1,31 @@
+import {readAllowedReturnTo} from './password-reset-return.js';
+
 (() => {
   'use strict';
 
   const SUPABASE_URL = 'https://bxjuhvshpmaivbavdwqp.supabase.co';
   const passwordRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{12,}$/;
   const root = document.querySelector('#recovery-root');
+  const returnLink = document.querySelector('#return-to-app');
+  const returnHelp = document.querySelector('#return-help');
   let accessToken = '';
   let publishableKey = '';
+
+  function configureReturnToApp() {
+    const returnTo = readAllowedReturnTo(window.location.search);
+    if (!returnTo) {
+      returnLink.hidden = true;
+      returnLink.removeAttribute('href');
+      returnHelp.hidden = false;
+      return;
+    }
+
+    returnLink.href = returnTo;
+    returnLink.hidden = false;
+    returnLink.addEventListener('click', () => {
+      returnHelp.hidden = false;
+    });
+  }
 
   function clearSensitiveUrl() {
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
@@ -101,6 +121,7 @@
   }
 
   async function start() {
+    configureReturnToApp();
     const params = new URLSearchParams(window.location.hash.slice(1));
     const token = params.get('access_token') || '';
     const refreshToken = params.get('refresh_token') || '';
