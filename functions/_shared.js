@@ -37,6 +37,6 @@ export async function googleAutomation(env,payload){
 }
 export async function sendEmail(env,{to,subject,html}){
   if(!env.RESEND_API_KEY)return googleAutomation(env,{action:'email',to:Array.isArray(to)?to:[to],subject,html});
-  const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+env.RESEND_API_KEY,'content-type':'application/json'},body:JSON.stringify({from:env.EMAIL_FROM||'Makanuy <reservas@makanuyconsultas.com>',to:Array.isArray(to)?to:[to],subject,html})});
+  const response=await fetch('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+env.RESEND_API_KEY,'content-type':'application/json'},body:JSON.stringify({from:env.EMAIL_FROM||'Makanuy <reservas@makanuynutricion.com>',to:Array.isArray(to)?to:[to],subject,html})});
   return {ok:response.ok,status:response.status};
 }

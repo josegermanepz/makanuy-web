@@ -38,7 +38,7 @@ def add_social_metadata(source: str) -> str:
     title = html.escape(re.sub(r'\s+', ' ', title_match.group(1)).strip(), quote=True)
     description = html.escape(desc_match.group(1) if desc_match else 'Nutrición personalizada, práctica y sin culpa con Makanuy.', quote=True)
     canonical = html.escape(canonical_match.group(1), quote=True)
-    image = 'https://www.makanuyconsultas.com/hero-collage.avif'
+    image = 'https://makanuynutricion.com/hero-collage.avif'
     metadata = (
         f'<meta property="og:type" content="website"><meta property="og:locale" content="es_MX">'
         f'<meta property="og:site_name" content="Makanuy"><meta property="og:title" content="{title}">'
@@ -233,7 +233,7 @@ def main() -> None:
         '@type': 'Person',
         'name': 'Yunuen Figueroa González',
         'jobTitle': 'Nutrióloga',
-        'url': 'https://www.makanuyconsultas.com/yunuen-figueroa/',
+        'url': 'https://makanuynutricion.com/yunuen-figueroa/',
         'worksFor': {'@type': 'ProfessionalService', 'name': 'Makanuy'},
         'sameAs': ['https://www.instagram.com/yunfig/'],
     }
@@ -263,8 +263,8 @@ def main() -> None:
     recipe_list_schema = {
         '@context': 'https://schema.org', '@type': 'ItemList', 'name': 'Recetarios Makanuy',
         'itemListElement': [
-            {'@type': 'ListItem', 'position': 1, 'url': 'https://www.makanuyconsultas.com/recetas/rollitos-del-mar/', 'name': 'Rollitos del Mar'},
-            {'@type': 'ListItem', 'position': 2, 'url': 'https://www.makanuyconsultas.com/recetas/tostadas-crunch-de-atun-tropical/', 'name': 'Tostadas Crunch de Atún Tropical'},
+            {'@type': 'ListItem', 'position': 1, 'url': 'https://makanuynutricion.com/recetas/rollitos-del-mar/', 'name': 'Rollitos del Mar'},
+            {'@type': 'ListItem', 'position': 2, 'url': 'https://makanuynutricion.com/recetas/tostadas-crunch-de-atun-tropical/', 'name': 'Tostadas Crunch de Atún Tropical'},
         ],
     }
     recipes.write_text(inject_schema(recipes.read_text(), recipe_list_schema))
