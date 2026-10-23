@@ -1,6 +1,6 @@
 (() => {
   const slug=new URLSearchParams(location.search).get('slug');
-  const site='https://www.makanuyconsultas.com';
+  const site='https://makanuynutricion.com';
   const text=(selector,value)=>{document.querySelector(selector).textContent=value};
   const meta=(selector,value)=>{const element=document.querySelector(selector);if(element)element.setAttribute('content',value)};
   if(!slug){text('#recipe-loading','No encontramos la receta solicitada.');return}
